@@ -1,0 +1,98 @@
+{  
+  "appTitle": "MetroMapMaker",   
+  "appLogo": "src/images/metroLogo.png",
+    
+  "cssFileForGui": "src/data/metroStyle.css",
+  "cssForWelcomeDialog": "src/data/welcomeDialog.css",
+    
+  "newButtonIcon": "src/images/New.png",  
+  "loadButtonIcon": "src/images/Load.png",
+  "saveButtonIcon": "src/images/Save.png",
+  "saveAsButtonIcon": "src/images/SaveAs.png",
+  "undoButtonIcon": "src/images/Undo.png",
+  "redoButtonIcon": "src/images/Redo.png",
+  "aboutButtonIcon": "src/images/About.png",
+  "exportButtonIcon": "src/images/Export.png",
+ 
+  "newButtonTooltip": "New File",
+  "loadButtonTooltip": "Load File",
+    "saveButtonTooltip": "Save",
+    "saveAsButtonTooltip": "Save As",
+    "exportButtonTooltip": "Export",
+    "undoButtonTooltip": "Undo",
+    "redoButtonTooltip": "Redo",
+    "aboutButtonTooltip": "About",
+    
+    "addLineIcon": "src/images/AddLine.png",
+    "removeLineIcon": "src/images/RemoveLine.png",
+    "editLineIcon": "src/images/Edit.png",
+    "addStationsToLineIcon": "src/images/Add.png",
+    "removeStationsFromLineIcon": "src/images/Remove.png",
+    "listAllStationsIcon": "src/images/List.png",
+    
+    
+    "addLineTooltip": "Add a new metro line.",
+    "removeLineTooltip": "Remove a metro line.",
+    "editLineTooltip": "Edit metro line",
+    "addStationsToLineTooltip": "Add a new station to the line",
+    "removeStationsFromLineTooltip": "Removes a station from the line.",
+    "listAllStationsTooltip": "Lists all the stations of the line.",
+    
+    "addStationIcon": "src/images/Add.png",
+    "removeStationIcon": "src/images/Remove.png",
+    "snapToGridIcon": "src/images/SnapToGrid.png",
+    "moveLabelIcon": "src/images/Move.png",
+    "rotateLabelIcon": "src/images/Rotate.png",
+    
+    "addStationTooltip": "Add a new station",
+    "removeStationTooltip": "Remove station",
+    "snapToGridTooltip": "Snap to grid",
+    "moveLabelTooltip": "Move label",
+    "rotateLabelTooltip": "Rotate Label",
+    
+    "findRouteIcon": "src/images/CalculateRoute.png", 
+    "findRouteTooltip": "Calculate the shortest route",
+    
+    "addTextIcon": "src/images/AddText.png",
+    "addImageIcon": "src/images/AddImage.png",
+    "setImageBackgroundIcon": "src/images/BackgroundImage.png",
+    "removeElementIcon": "src/images/Delete.png",
+    
+    "addTextTooltip": "Add Text",
+    "addImageTooltip": "Add Image",
+    "setImageBackgroundTooltip": "Set backgroundImage",
+    "removeElementTooltip": "Remove Element",
+    
+    "italIcon": "src/images/Ital.png",
+    "boldIcon": "src/images/Bold.png",
+    
+    "italTooltip": "Italicized Text",
+    "boldTooltip": "Bold Text",
+    
+    "zoomInIcon": "src/images/ZoomIn.png",
+    "zoomOutIcon": "src/images/ZoomOUt.png",
+    "enlargeMapIcon": "src/images/EnlargeMap.png",
+    "reduceMapIcon": "src/images/ReduceMap.png",
+    
+    "zoomInTooltip": "Zoom In",
+    "zoomOutTooltip": "Zoom Out",
+    "enlargeMapTooltip": "Enlarge the Map",
+    "reduceMapTooltip": "Reduce the Map",
+    
+    "showGridToggleIcon":"src/images/ShowGrid.png",
+    "showGridToggleTooltip":"Show Grid",
+    
+    "exitIcon": "src/images/Exit.png",
+    "exitTooltip": "Exit",
+    
+    "lineThicknessSliderTooltip": "Line Thickness",
+    "stationRadiusSliderTooltip": "Station Radius",
+    "setBackgroundColorPickerTooltip": "Set Background Color",
+    "fontColorPickerTooltip": "Font Color",
+    "lineColorPickerTooltip": "Line Color",
+    "stationColorPickerTooltip": "Station Color"
+
+    
+    
+
+}
