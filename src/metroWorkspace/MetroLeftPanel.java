@@ -350,11 +350,19 @@ public class MetroLeftPanel {
         
         // column 2
         stationRouterToolbarB = new VBox();
-        fromComboBox = new ComboBox();
+        fromComboBox = new ComboBox(App.app.getDataComponent().getMetroStations());
         fromComboBox.setPromptText("From");
+        
+        fromComboBox.setButtonCell((ListCell)cellFactory.call(null));
+        fromComboBox.setCellFactory(cellFactory); 
 
-        toComboBox = new ComboBox();
+        toComboBox = new ComboBox(App.app.getDataComponent().getMetroStations());
         toComboBox.setPromptText("To");
+        toComboBox.setButtonCell((ListCell)cellFactory.call(null));
+        toComboBox.setCellFactory(cellFactory);
+        
+        
+       
         
         stationRouterToolbarB.getChildren().add(fromComboBox);
         stationRouterToolbarB.getChildren().add(toComboBox);

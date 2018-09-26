@@ -175,11 +175,8 @@ public class MetroLine {
     
     public void loadStationsToTheLine(JsonArray jsonStations) {
         Station station;
-        System.out.println(connections.size());
         connections.get(0).disconnect();
-        System.out.println(connections.size());
-        connections.remove(0);
-        System.out.println(connections.size());
+        System.out.println(connections.size());        connections.remove(0);
         
         
         for (int j = 0; j < App.app.getDataComponent().getMetroStations().size(); j++) {

@@ -1,0 +1,143 @@
+/*
+    This style sheet stylizes the controls inside our
+    goLogoLo JavaFX application. Note that controls
+    in the UI must have the same class as those below in 
+    order to be rendered using those properties.
+
+    @author Richard McKenna
+    @author ?
+    @version 1.0
+*/
+.menu-label {
+    -fx-font-size: 15px;
+    -fx-pref-width: 138;
+
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+   
+}
+
+.left-panel-vbox {
+    
+    -fx-padding: 15;
+    -fx-spacing: 5;
+    -fx-border-style: solid solid solid solid;
+    -fx-border-width: 0 0 3 0;
+    -fx-border-color: black;
+    
+}
+
+.lowest-left-panel-vbox {
+    
+    -fx-padding: 15;
+    -fx-spacing: 10;
+    
+}
+
+.left-panel-odd-vbox {
+    
+    -fx-padding: 0;
+    -fx-spacing: 10;
+    
+}
+
+.left-panel-odd-hbox {
+    
+    -fx-spacing: 6;
+    -fx-padding: 15;
+    -fx-border-style: solid solid solid solid;
+    -fx-border-width: 0 0 3 0;
+    -fx-border-color: black; 
+    
+}
+
+.left-panel-hbox { 
+    -fx-spacing: 5; 
+}
+
+
+
+.combo-box {   
+    -fx-pref-width: 140;   
+}
+
+.font-combo-box {   
+    -fx-pref-width: 110;   
+}
+
+.color-picker {
+    -fx-background-color:  #ccddcc;
+    -fx-pref-width: 25;
+    -fx-pref-height: 25;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+    -fx-alignment: left;
+}
+
+.color-picker:pressed {
+    -fx-background-color: #ddeeee;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+
+.button {
+    -fx-background-color:   linear-gradient(#f5eab5 0%,#fedbda 100%);
+    -fx-pref-width: 30;
+    -fx-max-width: 30;
+    -fx-max-height: 30;
+    -fx-pref-height: 30;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+
+.button:pressed {
+    -fx-background-color:   linear-gradient(#f5ceb5 0%, #fedae8 100%);
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+
+
+
+
+.topPanel {
+    -fx-hgap: 20px;
+    -fx-background-color: linear-gradient(#DDEEDD 0%, #DDEEFF 50%, #AAEEDD 100%);
+    -fx-background-radius: 5.0;
+    -fx-padding: 15;
+    -fx-spacing: 50;
+    -fx-border-width: 3px;
+    -fx-border-color: #a877dd;
+}
+
+
+
+.topPanelContent {
+    -fx-spacing: 6;
+    
+}
+
+
+
+.leftPanel {
+    -fx-background-color: linear-gradient(#DDEEDD 0%, #DDEEFF 50%, #AAEEDD 100%);
+    -fx-background-radius: 5.0;
+    -fx-padding: 0;
+    -fx-spacing: 3;
+    -fx-border-width: 0 3 3 3;
+    -fx-border-color: #a877dd;
+    -fx-background-insets: 0, 1 1 0 0 ;
+    -fx-background-radius: 5.0;
+   
+}
+
+
+.header {
+    -fx-font-weight: bold;
+    -fx-font-size: 20;      
+}
+
+.color_chooser_pane {
+    -fx-background-color:seashell;
+    -fx-padding: 0px;
+}
+
+.color_chooser_control {
+    -fx-font-weight:bold;
+    -fx-font-size:20;     
+}

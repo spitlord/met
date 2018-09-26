@@ -14,7 +14,7 @@ import javax.json.JsonReader;
 
 /**
  *
- * @author XDXD
+ * @author 
  */
 public class Properties {
     
@@ -25,10 +25,4 @@ public class Properties {
         reader.close();
         return propertiesObject;
     }
-   
-    
-    
-     
-    
-    
 }

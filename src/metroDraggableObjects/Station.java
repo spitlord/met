@@ -15,6 +15,8 @@ import javafx.scene.text.FontWeight;
 import metroApp.App;
 import metroData.MetroData;
 import metroWorkspace.MetroCanvas;
+import transactions.MoveCircle;
+import transactions.Transaction;
 
 /**
  *
@@ -37,18 +39,21 @@ public class Station implements ChangeFont {
     int labelPosition;
     int labelRotation;
     ArrayList<MetroLine> lines;
+    ArrayList<Station> neighbors;
     boolean lineEndNameStation;
     
     
     public Station(String name) {
         
         
-        
+       
         lineEndNameStation = false;
         
         MetroCanvas metroCanvas = App.app.getWorkspace().getCanvasComponent();
         
         // all the lines that have this station
+
+        neighbors = new ArrayList<Station>();
         lines =  new ArrayList<MetroLine>();
         
         // set name
@@ -78,11 +83,25 @@ public class Station implements ChangeFont {
         
         // on dragged change location
  
-       
+        circle.setOnMousePressed(e -> {
+              App.app.getTransactions().pushUndo(new MoveCircle(circle));    
+        });
+        
         circle.setOnMouseDragged(e -> {
         circle.setCenterX(e.getX()+2);
         circle.setCenterY(e.getY()+2);
         e.consume();
+        });
+        
+        circle.setOnMouseReleased(e -> {
+              Transaction temp = App.app.getTransactions().peekUndo();
+              if (temp instanceof MoveCircle) {
+                  if (((MoveCircle) temp).getC() == circle &&
+                       ((MoveCircle) temp).getX() == circle.getCenterX() &&
+                       ((MoveCircle) temp).getY() == circle.getCenterY()) {
+                      App.app.getTransactions().popUndoWithouAction();
+                  }
+              }
         });
   
         // if station is clicked then it is selected
@@ -220,21 +239,21 @@ public class Station implements ChangeFont {
         
         switch (positionState) {
               case 0:
-                  label.layoutXProperty().bind(circle.centerXProperty().subtract(circle.radiusProperty().add(label.widthProperty()).add(25)));
+                  label.layoutXProperty().bind(circle.centerXProperty().subtract(circle.radiusProperty().add(label.widthProperty()).add(labelDistance)));
                   label.layoutYProperty().bind(label.heightProperty().divide(-2).add(circle.centerYProperty()));
 
                   break;
               case 1:
                   label.layoutXProperty().bind(label.widthProperty().divide(-2).add(circle.centerXProperty()));
-                  label.layoutYProperty().bind(circle.centerYProperty().subtract(circle.radiusProperty()).subtract(label.heightProperty()).subtract(25));
+                  label.layoutYProperty().bind(circle.centerYProperty().subtract(circle.radiusProperty()).subtract(label.heightProperty()).subtract(labelDistance));
                   break;  
               case 2:
-                  label.layoutXProperty().bind(circle.centerXProperty().add(circle.radiusProperty().add(25)));
+                  label.layoutXProperty().bind(circle.centerXProperty().add(circle.radiusProperty().add(labelDistance)));
                   label.layoutYProperty().bind(label.heightProperty().divide(-2).add(circle.centerYProperty()));
                   break;          
               case 3:
                   label.layoutXProperty().bind(label.widthProperty().divide(-2).add(circle.centerXProperty()));
-                  label.layoutYProperty().bind(circle.centerYProperty().add(circle.radiusProperty()).add(25));
+                  label.layoutYProperty().bind(circle.centerYProperty().add(circle.radiusProperty()).add(labelDistance));
                   break;
         
         
@@ -352,7 +371,12 @@ public class Station implements ChangeFont {
                   oldFont.getSize()));
           label.setFont(font);
       }
-    
+
+    public ArrayList<Station> getNeighbors() {
+        return neighbors;
+    }
+      
+      
      
    
  

@@ -6,6 +6,7 @@
 package metroApp;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -15,6 +16,8 @@ import metroData.MetroData;
 import metroFiles.MetroFiles;
 import metroWorkspace.MetroWorkspace;
 import metroWorkspace.WelcomeDialog;
+import transactions.Transaction;
+import transactions.TransactionStack;
 
 
 
@@ -30,12 +33,17 @@ public class App extends Application {
     
     public static App app;
     
+    
     private Stage stage;
     private Scene scene;
     private JsonObject propertiesObject;           // contains the properties and strings
     private MetroWorkspace workspace;              // the gui and method of communication between components
     private MetroFiles fileComponent;   
     private MetroData dataComponent;  
+    private TransactionStack transactions;
+        
+
+
     
     
     
@@ -56,8 +64,7 @@ public class App extends Application {
         dataComponent = new MetroData();
         workspace = new MetroWorkspace();
         
-        
-        
+        transactions = new TransactionStack();
         
         // show the stage after it has been set up
         primaryStage.setTitle(propertiesObject.getString("appTitle"));
@@ -68,32 +75,16 @@ public class App extends Application {
             
 
         stage = primaryStage;
-        
-       
-        WelcomeDialog.show(); 
-
-                
-                
-
-
+        WelcomeDialog.show();
         primaryStage.show();
     }
-
-   
-          
     
     
     
-    /**
-     * @param args the command line arguments
-     */
     
     public static void main(String[] args) {
         launch(args);
     }
-    
-    
-    
     
     public void setScene(Scene scene) {
         this.scene = scene;  
@@ -128,6 +119,12 @@ public class App extends Application {
     public MetroData getDataComponent() {
         return dataComponent;
     }
+
+    public TransactionStack getTransactions() {
+        return transactions;
+    }
+    
+    
     
     
     

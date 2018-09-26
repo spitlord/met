@@ -6,6 +6,7 @@
 package metroWorkspace;
 
 import javafx.scene.Group;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -153,7 +154,27 @@ public class MetroCanvas {
     
     public void initControllers() {
         controllers = new MetroCanvasControllers(App.app);
-        App.app.getScene().setOnKeyPressed(e -> {controllers.handleNavigateCanvas(e.getCode());});
+        
+        
+        App.app.getScene().setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.A)   MetroCanvasControllers.aDown = true;
+            else if (e.getCode() == KeyCode.D)   MetroCanvasControllers.dDown = true;
+            else if (e.getCode() == KeyCode.S)   MetroCanvasControllers.sDown = true;
+            else if (e.getCode() == KeyCode.W)   MetroCanvasControllers.wDown = true;
+            controllers.handleNavigateCanvas(e);
+
+            
+
+        }
+        );
+        App.app.getScene().setOnKeyReleased(e -> {
+            if (e.getCode() == KeyCode.A)   MetroCanvasControllers.aDown = false;
+            else if (e.getCode() == KeyCode.D)   MetroCanvasControllers.dDown = false;
+            else if (e.getCode() == KeyCode.S)   MetroCanvasControllers.sDown = false;
+            else if (e.getCode() == KeyCode.W)   MetroCanvasControllers.wDown = false;
+        
+        });
+
     }
     
 }

@@ -129,6 +129,11 @@ public class MetroTopPanel {
        } );
        exportButton.setOnAction(e -> {controllers.handleExportButton();    
        } ); 
+       
+       undoButton.setOnAction(e -> {controllers.handleUndoButton();
+       } );
+       redoButton.setOnAction(e -> {controllers.handleRedoButton();
+       } );
    
         
     }

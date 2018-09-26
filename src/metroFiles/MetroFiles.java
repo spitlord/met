@@ -10,7 +10,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Optional;
 import javafx.collections.ObservableList;
@@ -152,7 +151,6 @@ public class MetroFiles {
             for (int j = 0; j < lineJson.getJsonArray("connections").size(); j++) {
                 x = connectionsJson.getJsonObject(j).getJsonNumber("curveX").doubleValue();
                 y = connectionsJson.getJsonObject(j).getJsonNumber("curveY").doubleValue();
-                System.out.println(x + " " + y);
                 connections.get(j).getControl().setCenterY(y);
                 connections.get(j).getControl().setCenterX(x);
             }

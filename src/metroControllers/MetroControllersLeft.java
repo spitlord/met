@@ -349,17 +349,15 @@ public class MetroControllersLeft {
        
    
    
-   public void handleSetBackgroundColorButton(Color c) {
-       App.app.getDataComponent().setBackGroundColor(c);
-        // parse string to extract rgb
-        String color = c.toString();
-        color = color.substring(2, 8);
-        
-        // set the canvas color field
-        App.app.getWorkspace().getCanvasComponent().setCanvasColor(c);
+   public void handleSetBackgroundColorButton(Color color) {
+        App.app.getDataComponent().setBackGroundColor(color);
+        App.app.getWorkspace().getCanvasComponent().setCanvasColor(color);
         
         // now change the css of the canvas
-        App.app.getWorkspace().getCanvasComponent().getCanvas().setStyle("-fx-background-color: #" + color + ";");
+        App.app.getWorkspace().getCanvasComponent().getCanvas().
+                setStyle("-fx-background-color: #" +
+                        color.toString().substring(2, 8) +
+                        ";");
     }
    
    

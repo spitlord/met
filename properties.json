@@ -90,8 +90,10 @@
     "setBackgroundColorPickerTooltip": "Set Background Color",
     "fontColorPickerTooltip": "Font Color",
     "lineColorPickerTooltip": "Line Color",
-    "stationColorPickerTooltip": "Station Color"
+    "stationColorPickerTooltip": "Station Color",
+    "initBackgroundColor": "red"
 
+    
     
     
 

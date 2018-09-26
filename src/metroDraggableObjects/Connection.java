@@ -10,6 +10,8 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.QuadCurve;
 import metroApp.App;
 import metroWorkspace.MetroCanvas;
+import transactions.MoveCircle;
+import transactions.Transaction;
 
 /**
  *
@@ -21,6 +23,7 @@ public class Connection {
     QuadCurve connectionCurve;
     MetroLine metroLine;
     Circle control;
+    Station a, b;
     
     Connection() {}
 
@@ -93,26 +96,50 @@ public class Connection {
                 
             }
             
-            
             e.consume();
         });
+        
+        
+        
+        
+        
         control.setOnMouseDragged(e -> {
             control.setCenterX(e.getX());
             control.setCenterY(e.getY());
             e.consume();
         });
         
-        control.setOnMouseReleased(e -> {
-            control.setCenterX(e.getX());
-            control.setCenterY(e.getY());
-            control.setVisible(true);
-            e.consume();
+     control.setOnMousePressed(e -> {
+              App.app.getTransactions().pushUndo(new MoveCircle(control));    
+        });
+        control.setOnMouseDragged(e -> {
+        control.setCenterX(e.getX()+2);
+        control.setCenterY(e.getY()+2);
+        e.consume();
         });
         
+       control.setOnMouseReleased(e -> {
+              Transaction temp = App.app.getTransactions().peekUndo();
+              if (temp instanceof MoveCircle) {
+                  if (
+                      ((MoveCircle) temp).getC() == control &&
+                      ((MoveCircle) temp).getX() == control.getCenterX() &&
+                      ((MoveCircle) temp).getY() == control.getCenterY()) {
+                      App.app.getTransactions().popUndoWithouAction();
+                  }
+              }
+        });
+  
         metroCanvas.getCanvas().getChildren().addAll(connectionCurve, control);
        
         // put behind the circle not to obstract the dragging
         connectionCurve.toBack();
+        
+            try {
+            a.getNeighbors().add(b);
+            b.getNeighbors().add(a);
+            }  catch (NullPointerException ex) {}
+          
     }
     
     
@@ -125,6 +152,10 @@ public class Connection {
         // remove from the root
         metroCanvas.getCanvas().getChildren().remove(connectionCurve);
         metroCanvas.getCanvas().getChildren().remove(control);
+      try {
+        a.getNeighbors().remove(b);
+        b.getNeighbors().remove(a);
+      } catch (NullPointerException ex) {}
     }
 
     public Circle getControl() {

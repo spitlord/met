@@ -34,17 +34,13 @@ public class MetroData {
         
         // observable lists are for comboboxes
         metroLines = FXCollections.observableArrayList();
-        
-        
-        
         metroStations = FXCollections.observableArrayList(); 
         fontFamilies = FXCollections.observableArrayList();
         fontFamilies.addAll("Arial", "Courier", "PT Sans", "PT Serif", "Times New Roman");
         
         fontSizes = FXCollections.observableArrayList();
         fontSizes.addAll(8, 10, 11, 12, 14, 16, 18, 20, 24, 28, 36, 48);
-        
-        backGroundColor = Color.WHITE;
+        backGroundColor = Color.valueOf(App.app.getDataObject().getString("initBackgroundColor"));
     
     }
 

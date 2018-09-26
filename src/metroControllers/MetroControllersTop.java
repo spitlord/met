@@ -83,8 +83,12 @@ public class MetroControllersTop {
     public void handleSaveAsButton() {}
     
 
-    public void handleUndoButton() {}
-    public void handleRedoButton() {}
+    public void handleUndoButton() {
+        App.app.getTransactions().popUndo();
+    }
+    public void handleRedoButton() {
+        App.app.getTransactions().popRedo();
+    }
     
  
     public void handleAboutButton() {
