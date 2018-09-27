@@ -5,6 +5,8 @@
  */
 package metroWorkspace;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javafx.scene.Group;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
@@ -23,7 +25,6 @@ public class MetroCanvas {
     private Pane canvasHolder;
     // can be zoomed, increaced in size, without changing the border pane
     private Pane canvas;
-    private Color canvasColor;
     private MetroCanvasControllers controllers;
     private Group grid;
     private boolean showGrid;
@@ -53,6 +54,25 @@ public class MetroCanvas {
     }
     
     
+    public void makeGrid() {
+        grid = new Group();
+        Line line;
+        for (int i = 0; i < 200; i++) {
+            line = new Line(0,i*50,10000,i*50);
+            grid.getChildren().add(line);
+        } 
+        
+        for (int j = 0; j < 200; j++) {
+            line = new Line(j*50,0,j*50,10000);
+            grid.getChildren().add(line);
+        }
+        // do not show grid yet 
+        showGrid = false;
+        grid.setVisible(showGrid);
+        
+        // add grid to canvas
+        canvas.getChildren().add(grid);
+    }
     
     public MetroCanvas initCanvas(){
         // place the canvas into the holder
@@ -85,34 +105,12 @@ public class MetroCanvas {
             }
             
         });
-        canvasColor = Color.BLUE;
-        canvas.setStyle("-fx-background-color: #ffffff;");
-        
-
         
         
         // create the grid, set invisible
-        grid = new Group();
-        Line line;
-        for (int i = 0; i < 200; i++) {
-            line = new Line(0,i*50,10000,i*50);
-            grid.getChildren().add(line);
-        } 
+       
         
-        for (int j = 0; j < 200; j++) {
-            line = new Line(j*50,0,j*50,10000);
-            grid.getChildren().add(line);
-        }
-        // do not show grid yet 
-        showGrid = false;
-        grid.setVisible(showGrid);
-        
-        // add grid to canvas
-        canvas.getChildren().add(grid);
-        
-        
-    
-
+        makeGrid();
         
         canvasHolder.getChildren().add(canvas);
         //try
@@ -124,10 +122,7 @@ public class MetroCanvas {
     /**
      * @return the canvasColor
      */
-    public Color getCanvasColor() {
-        return canvasColor;
-    }
-    
+
     //public void 
     
     public void addGrid() {
@@ -148,8 +143,12 @@ public class MetroCanvas {
     /**
      * @param canvasColor the canvasColor to set
      */
-    public void setCanvasColor(Color canvasColor) {
-        this.canvasColor = canvasColor;
+    public void setCanvasColor(Color c) {
+        
+        App.app.getWorkspace().getCanvasComponent().getCanvas().
+                setStyle("-fx-background-color: #" +
+                        c.toString().substring(2, 8) +
+                        ";");
     }
     
     public void initControllers() {
@@ -174,7 +173,16 @@ public class MetroCanvas {
             else if (e.getCode() == KeyCode.W)   MetroCanvasControllers.wDown = false;
         
         });
+        
+        
 
+    }
+    
+    public Color getCanvasColor() {
+        String s = canvas.getStyle();
+        s = s.substring(s.length() - 7,s.length()-1);
+        Color c = Color.valueOf(s);
+        return c;
     }
     
 }

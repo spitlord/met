@@ -10,11 +10,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Optional;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
@@ -31,6 +33,7 @@ import javax.json.JsonWriter;
 import metroApp.App;
 import metroData.MetroData;
 import metroDraggableObjects.Connection;
+import metroDraggableObjects.DraggableText;
 import metroDraggableObjects.MetroLine;
 import metroDraggableObjects.Station;
 
@@ -78,16 +81,27 @@ public class MetroFiles {
         }
     }
 
-    public void loadFile() throws FileNotFoundException {
+    private JsonArrayBuilder saveText() {
 
-        App.app.getDataComponent().resetData();
-        File currentFile = App.app.getWorkspace().getCurrentFile();
-        FileInputStream os = new FileInputStream(currentFile);
-        JsonReader reader = Json.createReader(os);
+        JsonArrayBuilder array = Json.createArrayBuilder();
+        JsonObjectBuilder j = Json.createObjectBuilder();
 
-        JsonObject jsonFile = reader.readObject();
+        ArrayList<DraggableText> text = App.app.getDataComponent().getText();
+        for (int i = 0; i < text.size(); i++) {
+            j.add("content", text.get(i).getText());
+            j.add("font", text.get(i).getFont().getFamily());
+            j.add("fontColor", text.get(i).getColor().toString());
+            j.add("fontSize", text.get(i).getFont().getSize());
+            j.add("bold", text.get(i).isBold());
+            j.add("ital", text.get(i).isItal());
+            j.add("x", text.get(i).getLabel().getTranslateX());
+            j.add("y", text.get(i).getLabel().getTranslateY());
+            array.add(j);
+        }
+        return array;
+    }
 
-        // add stations to the map
+    private void loadStations(JsonObject jsonFile) {
         for (int i = 0; i < jsonFile.getJsonArray("stations").size(); i++) {
             JsonObject stationJson = jsonFile.getJsonArray("stations").getJsonObject(i);
 
@@ -109,13 +123,15 @@ public class MetroFiles {
             station.getCircle().setCenterY(stationJson.getJsonNumber("y").doubleValue());
 
         }
+    }
 
-        // load lines
+    private void loadLines(JsonObject jsonFile) {
+
         for (int i = 0; i < jsonFile.getJsonArray("lines").size(); i++) {
             JsonObject lineJson = jsonFile.getJsonArray("lines").getJsonObject(i);
             MetroLine line = new MetroLine(lineJson.getString("name"));
             line.changeLineColor(Color.valueOf(lineJson.getString("color")));
-      
+
             line.getBeginning().changeFontSize(lineJson.getJsonNumber("fontSize").doubleValue());
 
             double x, y;
@@ -157,7 +173,45 @@ public class MetroFiles {
         }
     }
 
-    public JsonObjectBuilder saveStation(Station s) {
+    private void loadText(JsonObject jsonFile) {
+
+        for (int i = 0; i < jsonFile.getJsonArray("text").size(); i++) {
+            JsonObject textJson = jsonFile.getJsonArray("text").getJsonObject(i);
+            DraggableText t = new DraggableText(textJson.getString("content"));
+            App.app.getDataComponent().getText().add(t);
+            t.changeFontFamily(textJson.getString("font"));
+            t.changeFontSize(textJson.getJsonNumber("fontSize").doubleValue());
+            t.changeFontColor(Color.valueOf(textJson.getString("fontColor")));
+            if (textJson.getBoolean("bold")) {
+                t.changeFontBold();
+            }
+            if (textJson.getBoolean("ital")) {
+                t.changeFontItal();
+            }
+            t.getLabel().setTranslateX(textJson.getJsonNumber("x").doubleValue());
+            t.getLabel().setTranslateY(textJson.getJsonNumber("y").doubleValue());
+
+        }
+
+    }
+
+    public void loadFile() throws FileNotFoundException {
+
+        App.app.getDataComponent().resetData();
+        File currentFile = App.app.getWorkspace().getCurrentFile();
+        FileInputStream os = new FileInputStream(currentFile);
+        JsonReader reader = Json.createReader(os);
+        JsonObject jsonFile = reader.readObject();
+
+        loadStations(jsonFile);
+        loadLines(jsonFile);
+        loadText(jsonFile);
+
+        Color c = Color.valueOf(jsonFile.getString("canvasColor"));
+        App.app.getWorkspace().getCanvasComponent().setCanvasColor(c);
+    }
+
+    private JsonObjectBuilder saveStation(Station s) {
         JsonObjectBuilder j = Json.createObjectBuilder();
         j.add("name", s.getName());
         j.add("radius", s.getCircle().getRadius());
@@ -171,12 +225,23 @@ public class MetroFiles {
         j.add("ital", s.isItal());
         j.add("labelPosition", s.getLabelPosition());
         j.add("labelRotation", s.getLabelRotation());
-
         return j;
-
     }
 
-    public JsonObjectBuilder saveLine(MetroLine l) {
+    private JsonArrayBuilder saveStations() {
+        ObservableList<Station> stations = App.app.getDataComponent().getMetroStations();
+        JsonArrayBuilder stationsJson = Json.createArrayBuilder();
+        for (int i = 0; i < stations.size(); i++) {
+            if (stations.get(i).getName().charAt(0) == ' ') {
+                continue;
+            }
+            stationsJson.add(saveStation(stations.get(i)));
+        }
+
+        return stationsJson;
+    }
+
+    private JsonObjectBuilder saveLine(MetroLine l) {
         JsonObjectBuilder j = Json.createObjectBuilder();
         j.add("name", l.getName());
         j.add("color", l.getColor().toString());
@@ -214,12 +279,22 @@ public class MetroFiles {
             connection.add("curveX", connections.get(i).getControl().getCenterX());
             connection.add("curveY", connections.get(i).getControl().getCenterY());
             connectionsJson.add(connection);
-
         }
         j.add("connections", connectionsJson);
 
         return j;
 
+    }
+
+    private JsonArrayBuilder saveLines() {
+        // Deal with lines
+        ObservableList<MetroLine> lines = App.app.getDataComponent().getMetroLines();
+
+        JsonArrayBuilder linesJson = Json.createArrayBuilder();
+        for (int i = 0; i < lines.size(); i++) {
+            linesJson.add(saveLine(lines.get(i)));
+        }
+        return linesJson;
     }
 
     public void saveFile() throws FileNotFoundException {
@@ -229,27 +304,11 @@ public class MetroFiles {
         JsonObjectBuilder file = Json.createObjectBuilder();
 
         // Deal with stations
-        ObservableList<Station> stations = App.app.getDataComponent().getMetroStations();
-
-        JsonArrayBuilder stationsJson = Json.createArrayBuilder();
-        for (int i = 0; i < stations.size(); i++) {
-            if (stations.get(i).getName().charAt(0) == ' ') {
-                continue;
-            }
-            stationsJson.add(saveStation(stations.get(i)));
-        }
-
-        file.add("stations", stationsJson);
-
-        // Deal with lines
-        ObservableList<MetroLine> lines = App.app.getDataComponent().getMetroLines();
-
-        JsonArrayBuilder linesJson = Json.createArrayBuilder();
-        for (int i = 0; i < lines.size(); i++) {
-            linesJson.add(saveLine(lines.get(i)));
-        }
-
-        file.add("lines", linesJson);
+        file.add("stations", saveStations());
+        file.add("lines", saveLines());
+        file.add("text", saveText());
+        file.add("canvasColor",
+                App.app.getWorkspace().getCanvasComponent().getCanvasColor().toString());
 
         String name = App.app.getWorkspace().getCurrentFile().getName();
 
@@ -264,6 +323,7 @@ public class MetroFiles {
     }
 
     public void saveFileAs() {
+
     }
 
     public void export() {
@@ -288,71 +348,10 @@ public class MetroFiles {
             ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", outFile);
         } catch (Exception eu) {
         }
+
     }
 
     public void jsonexport() throws FileNotFoundException {
-        MetroData data = App.app.getDataComponent();
-
-        JsonObjectBuilder j = Json.createObjectBuilder();
-        JsonArrayBuilder ab = Json.createArrayBuilder();
-
-        JsonObjectBuilder lineBuilder = Json.createObjectBuilder();
-        JsonArrayBuilder lineStationArray = Json.createArrayBuilder();
-
-        JsonObjectBuilder stationBuilder = Json.createObjectBuilder();
-
-        JsonObjectBuilder colorBuilder = Json.createObjectBuilder();
-
-        j.add("name", App.app.getWorkspace().getCurrentFile().getName());
-
-        for (int i = 0; i < data.getMetroLines().size(); i++) {
-
-            MetroLine line = data.getMetroLines().get(i);
-
-            lineBuilder.add("name", line.getName());
-            lineBuilder.add("circular", "false");
-
-            Color color = line.getColor();
-
-            colorBuilder.add("red", color.getRed());
-            colorBuilder.add("green", color.getGreen());
-            colorBuilder.add("blue", color.getBlue());
-            colorBuilder.add("alpha", color.getOpacity());
-
-            lineBuilder.add("color", colorBuilder);
-
-            for (int k = 1; k < line.getStations().size() - 1; k++) {
-                lineStationArray.add(line.getStations().get(k).getName());
-            }
-            lineBuilder.add("station_names", lineStationArray);
-
-            // add to line array
-            ab.add(lineBuilder);
-
-        }
-
-        j.add("lines", ab);
-
-        for (int i = 0; i < data.getMetroStations().size(); i++) {
-            Station station = data.getMetroStations().get(i);
-            stationBuilder.add("name", station.getName());
-            stationBuilder.add("x", station.getCircle().getCenterX());
-            stationBuilder.add("y", station.getCircle().getCenterY());
-            stationBuilder.add("radius", station.getCircle().getRadius());
-            ab.add(stationBuilder);
-
-        }
-
-        j.add("stations", ab);
-
-        String name = App.app.getWorkspace().getCurrentFile().getName();
-        File file = new File("src/exp/" + name);
-        FileOutputStream os = new FileOutputStream(file);
-
-        JsonWriter jsonWriter = Json.createWriter(os);
-        jsonWriter.writeObject(j.build());
-        jsonWriter.close();
-
     }
 
 }

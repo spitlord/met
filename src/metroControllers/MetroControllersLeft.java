@@ -311,7 +311,7 @@ public class MetroControllersLeft {
             String filePath = file.toString();
             if (filePath.endsWith(".jpeg") || filePath.endsWith(".jpg")  || filePath.endsWith(".png") || filePath.endsWith(".gif"))
                 {
-                    DraggableImage image = new DraggableImage(App.app, file);
+                    DraggableImage image = new DraggableImage(file);
                     App.app.getDataComponent().setLastSelectedElement(image);
                 }
        } catch (NullPointerException ex) {}
@@ -327,7 +327,7 @@ public class MetroControllersLeft {
 
        // discard null string and cancel or close button
        if (result.isPresent() && !(result.get().equals(""))) {
-           DraggableText text = new DraggableText(App.app, result.get());
+           DraggableText text = new DraggableText(result.get());
            App.app.getDataComponent().setLastSelectedElement(text);
        }
    }
@@ -350,14 +350,7 @@ public class MetroControllersLeft {
    
    
    public void handleSetBackgroundColorButton(Color color) {
-        App.app.getDataComponent().setBackGroundColor(color);
-        App.app.getWorkspace().getCanvasComponent().setCanvasColor(color);
-        
-        // now change the css of the canvas
-        App.app.getWorkspace().getCanvasComponent().getCanvas().
-                setStyle("-fx-background-color: #" +
-                        color.toString().substring(2, 8) +
-                        ";");
+       App.app.getWorkspace().getCanvasComponent().setCanvasColor(color);
     }
    
    

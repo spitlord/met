@@ -78,9 +78,6 @@ public class MetroWorkspace {
         
         // initialize canvas and panels
         canvasComponent.initCanvas();
-        
-        
-        
         topHBox = topPanel.initPanel();
         leftVBox = leftPanel.initPanel();
         
@@ -139,8 +136,7 @@ public class MetroWorkspace {
         return canvasComponent;
     }
     
-    
-    
+
     
     
     

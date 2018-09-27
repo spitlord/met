@@ -16,18 +16,20 @@ import metroApp.App;
  */
 public class DraggableImage {
     
-    App app;
+
     double startX, startY, translateX, translateY;
     Image image;
+    File file;
     ImageView imageView;
     
-    public DraggableImage(App app, File file) {
-        
-        this.app = app;
+    public DraggableImage(File file) {
+               
+
         
         image = new Image(file.toURI().toString());
         imageView = new ImageView(image);
-        app.getWorkspace().getCanvasComponent().getCanvas().getChildren().add(imageView);
+        App.app.getWorkspace().getCanvasComponent().getCanvas().getChildren().add(imageView);
+        App.app.getDataComponent().getImages().add(this);
         
         imageView.setOnMousePressed(e -> {
             startX = e.getSceneX();
@@ -36,7 +38,7 @@ public class DraggableImage {
             translateX = imageView.getTranslateX();
             translateY = imageView.getTranslateY();       
             imageView.toFront();
-            app.getDataComponent().setLastSelectedElement(this);
+            App.app.getDataComponent().setLastSelectedElement(this);
         });
         imageView.setOnMouseDragged(e -> {
             double offsetX = e.getSceneX() - startX;
@@ -46,13 +48,12 @@ public class DraggableImage {
             
             imageView.setTranslateX(finalTranslateX);
             imageView.setTranslateY(finalTranslateY);
-            
             e.consume();
         });
     }
     
     public void deleteImage() {
-        app.getWorkspace().getCanvasComponent().getCanvas().getChildren().remove(imageView);
+        App.app.getWorkspace().getCanvasComponent().getCanvas().getChildren().remove(imageView);
     }
     
 }

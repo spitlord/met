@@ -6,7 +6,6 @@
 package metroApp;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -16,7 +15,6 @@ import metroData.MetroData;
 import metroFiles.MetroFiles;
 import metroWorkspace.MetroWorkspace;
 import metroWorkspace.WelcomeDialog;
-import transactions.Transaction;
 import transactions.TransactionStack;
 
 

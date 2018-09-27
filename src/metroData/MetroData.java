@@ -5,11 +5,14 @@
  */
 package metroData;
 
+import java.util.ArrayList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 import metroApp.App;
 import metroDraggableObjects.Connection;
+import metroDraggableObjects.DraggableImage;
+import metroDraggableObjects.DraggableText;
 import metroDraggableObjects.MetroLine;
 import metroDraggableObjects.Station;
 
@@ -24,23 +27,26 @@ public class MetroData {
     private final ObservableList<Station> metroStations;
     private final ObservableList<String> fontFamilies;
     private final ObservableList<Integer> fontSizes;
-    MetroLine selectedLine; 
-    Station selectedStation;
-    Connection selectedConnection;
-    Object lastSelectedElement;
-    Color backGroundColor;
+    private final ArrayList<DraggableText> text;
+    private final ArrayList<DraggableImage> images;
+
+    private MetroLine selectedLine; 
+    private Station selectedStation;
+    private Connection selectedConnection;
+    private Object lastSelectedElement;
 
     public MetroData() {
         
         // observable lists are for comboboxes
         metroLines = FXCollections.observableArrayList();
         metroStations = FXCollections.observableArrayList(); 
+        text = new ArrayList();
+        images = new ArrayList();
         fontFamilies = FXCollections.observableArrayList();
         fontFamilies.addAll("Arial", "Courier", "PT Sans", "PT Serif", "Times New Roman");
         
         fontSizes = FXCollections.observableArrayList();
         fontSizes.addAll(8, 10, 11, 12, 14, 16, 18, 20, 24, 28, 36, 48);
-        backGroundColor = Color.valueOf(App.app.getDataObject().getString("initBackgroundColor"));
     
     }
 
@@ -79,10 +85,7 @@ public class MetroData {
         return lastSelectedElement;
     }
 
-    public void setBackGroundColor(Color backGroundColor) {
-        this.backGroundColor = backGroundColor;
-    }
-    
+
     
     
     public void setSelectedConnection(Connection newSelectedConnection) {
@@ -163,18 +166,27 @@ public class MetroData {
         
         metroLines.clear();
         metroStations.clear();
+        text.clear();
         
-        backGroundColor = Color.WHITE;
-        App.app.getWorkspace().getCanvasComponent().setCanvasColor(backGroundColor);
+        App.app.getWorkspace().getCanvasComponent().setCanvasColor(Color.WHITE);
         
         selectedLine = null;
         selectedStation = null;
         selectedConnection = null;
         lastSelectedElement = null;
-        } catch (NullPointerException ex) {}
-        
-        
+        } catch (NullPointerException ex) {}  
     }
+
+    public ArrayList<DraggableText> getText() {
+        return text;
+    }
+
+    public ArrayList<DraggableImage> getImages() {
+        return images;
+    }
+    
+    
+    
 
     
     

@@ -17,23 +17,15 @@ import metroApp.App;
  * @author XDXD
  */
 public class DraggableText implements ChangeFont {
-    App app;
     
-    String text;
     Label label;
     boolean bold;
     boolean ital;
-    Color color;
     Font font;
     
     double startX, startY, translateX, translateY;
 
-    public DraggableText(App app, String text) {
-        
-        this.app = app;
-      
-            
-
+    public DraggableText(String text) {
         label = new Label(text);
         
         // font
@@ -42,19 +34,17 @@ public class DraggableText implements ChangeFont {
         ital = false;
         label.setFont(font); 
         // color
-        color = Color.BLACK;
-        label.setTextFill(color);
         
         label.setOnMousePressed(e -> {
-            app.getWorkspace().getLeftPanel().getFontFamily().setValue(label.getFont().getFamily());
-            app.getWorkspace().getLeftPanel().getFontSize().setValue((int)label.getFont().getSize());
+            App.app.getWorkspace().getLeftPanel().getFontFamily().setValue(label.getFont().getFamily());
+            App.app.getWorkspace().getLeftPanel().getFontSize().setValue((int)label.getFont().getSize());
             startX = e.getSceneX();
             startY = e.getSceneY();
             
             translateX = label.getTranslateX();
             translateY = label.getTranslateY();       
             label.toFront();
-            app.getDataComponent().setLastSelectedElement(this);
+            App.app.getDataComponent().setLastSelectedElement(this);
         });
         label.setOnMouseDragged(e -> {
             double offsetX = e.getSceneX() - startX;
@@ -67,9 +57,9 @@ public class DraggableText implements ChangeFont {
             
             e.consume();
         });
-     
         
-        app.getWorkspace().getCanvasComponent().getCanvas().getChildren().add(label);
+        App.app.getDataComponent().getText().add(this);
+        App.app.getWorkspace().getCanvasComponent().getCanvas().getChildren().add(label);
         
     }
     
@@ -96,8 +86,7 @@ public class DraggableText implements ChangeFont {
       }
       
       public void changeFontColor (Color c) {
-          this.color = c;
-          label.setTextFill(color);    
+          label.setTextFill(c);    
       }
       
       public void changeFontBold() {
@@ -119,6 +108,36 @@ public class DraggableText implements ChangeFont {
                   oldFont.getSize()));
           label.setFont(font);
       }
+
+    public boolean isBold() {
+        return bold;
+    }
+
+    public boolean isItal() {
+        return ital;
+    }
+
+    public Font getFont() {
+        return font;
+    }
+
+    public Color getColor() {
+        return (Color) label.getTextFill();
+    }
+
+    public String getText() {
+        return label.getText();
+    }
+
+    public Label getLabel() {
+        return label;
+    }
+    
+    
+    
+  
+    
+      
     
         
     
