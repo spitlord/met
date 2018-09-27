@@ -207,7 +207,7 @@ public class MetroLeftPanel {
         lineColorPicker = new ColorPicker();
         lineColorPicker.setValue(Color.BLACK);
         // set tooltip
-        lineColorPicker.setTooltip(new Tooltip(App.app.getDataObject().getString("lineColorPickerTooltip")));
+        lineColorPicker.setTooltip(new Tooltip(App.app.getProperties().getString("lineColorPickerTooltip")));
 
          
         metroLinesToolbarA.getChildren().add(metroLinesLabel);
@@ -235,7 +235,7 @@ public class MetroLeftPanel {
         lineThicknessSlider.setMin(1);
         lineThicknessSlider.setMax(15);
         
-        lineThicknessSlider.setTooltip(new Tooltip(App.app.getDataObject().getString("lineThicknessSliderTooltip")));
+        lineThicknessSlider.setTooltip(new Tooltip(App.app.getProperties().getString("lineThicknessSliderTooltip")));
         
         
         // add three rows in one container 
@@ -295,7 +295,7 @@ public class MetroLeftPanel {
 
         stationColorPicker = new ColorPicker();
         stationColorPicker.setValue(Color.BLACK);
-        stationColorPicker.setTooltip(new Tooltip(App.app.getDataObject().getString("stationColorPickerTooltip")));
+        stationColorPicker.setTooltip(new Tooltip(App.app.getProperties().getString("stationColorPickerTooltip")));
 
         
         metroStationsToolbarA.getChildren().add(metroStationsLabel);
@@ -323,7 +323,7 @@ public class MetroLeftPanel {
         stationRadiusSlider.setMin(3);
         stationRadiusSlider.setMax(30);
         
-        stationRadiusSlider.setTooltip(new Tooltip(App.app.getDataObject().getString("stationRadiusSliderTooltip")));
+        stationRadiusSlider.setTooltip(new Tooltip(App.app.getProperties().getString("stationRadiusSliderTooltip")));
 
         
         // add together
@@ -382,7 +382,7 @@ public class MetroLeftPanel {
         decorLabel = new Label("Decor");
         setBackgroundColorPicker = new ColorPicker();
         setBackgroundColorPicker.setValue(Color.WHITE);
-        setBackgroundColorPicker.setTooltip(new Tooltip(App.app.getDataObject().getString("setBackgroundColorPickerTooltip")));
+        setBackgroundColorPicker.setTooltip(new Tooltip(App.app.getProperties().getString("setBackgroundColorPickerTooltip")));
         
         decorToolbarA.getChildren().add(decorLabel);
         
@@ -421,7 +421,7 @@ public class MetroLeftPanel {
         fontLabel = new Label("Font");
         fontColorPicker  = new ColorPicker();
         fontColorPicker.setValue(Color.BLACK);
-        fontColorPicker.setTooltip(new Tooltip(App.app.getDataObject().getString("fontColorPickerTooltip")));
+        fontColorPicker.setTooltip(new Tooltip(App.app.getProperties().getString("fontColorPickerTooltip")));
 
 
         
@@ -472,9 +472,9 @@ public class MetroLeftPanel {
         
         showGridToggleButton = new ToggleButton();
         showGridToggleButton.setGraphic(new ImageView(new Image
-                        ("file:" + App.app.getDataObject().getString("showGridToggleIcon"))));
+                        ("file:" + App.app.getProperties().getString("showGridToggleIcon"))));
         
-        showGridToggleButton.setTooltip(new Tooltip(App.app.getDataObject().getString("showGridToggleTooltip")));
+        showGridToggleButton.setTooltip(new Tooltip(App.app.getProperties().getString("showGridToggleTooltip")));
         
 
 
@@ -530,10 +530,10 @@ public class MetroLeftPanel {
      private void initButton(Button button, Pane pane,  String icon, String tooltip) {
        
         // icon
-        button.setGraphic(new ImageView(new Image("file:" + App.app.getDataObject().getString(icon))));
+        button.setGraphic(new ImageView(new Image("file:" + App.app.getProperties().getString(icon))));
         
         // tooltip 
-        button.setTooltip(new Tooltip(App.app.getDataObject().getString(tooltip)));
+        button.setTooltip(new Tooltip(App.app.getProperties().getString(tooltip)));
        
         // style from css file
         button.getStyleClass().add("button");

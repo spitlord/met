@@ -23,9 +23,8 @@ public class DraggableImage {
     ImageView imageView;
     
     public DraggableImage(File file) {
-               
-
         
+        this.file = file;
         image = new Image(file.toURI().toString());
         imageView = new ImageView(image);
         App.app.getWorkspace().getCanvasComponent().getCanvas().getChildren().add(imageView);
@@ -54,6 +53,23 @@ public class DraggableImage {
     
     public void deleteImage() {
         App.app.getWorkspace().getCanvasComponent().getCanvas().getChildren().remove(imageView);
+        App.app.getDataComponent().getImages().remove(this);
     }
+
+    public Image getImage() {
+        return image;
+    }
+
+    public ImageView getImageView() {
+        return imageView;
+    }
+
+    public File getFile() {
+        return file;
+    }
+    
+    
+    
+    
     
 }

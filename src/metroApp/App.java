@@ -101,7 +101,7 @@ public class App extends Application {
     /**
      * @return the propertiesObject
      */
-    public JsonObject getDataObject() {
+    public JsonObject getProperties() {
         return propertiesObject;
     }
     

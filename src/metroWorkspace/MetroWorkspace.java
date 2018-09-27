@@ -100,7 +100,7 @@ public class MetroWorkspace {
     
     
     public void initStylesheets(Scene scene, String key) {
-          scene.getStylesheets().add("file:" + App.app.getDataObject().getString(key));
+          scene.getStylesheets().add("file:" + App.app.getProperties().getString(key));
     }
      
     

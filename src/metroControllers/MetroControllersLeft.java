@@ -370,6 +370,7 @@ public class MetroControllersLeft {
        
        try {
            if (lastSelected instanceof DraggableText) {
+               ((DraggableText) lastSelected).remove();
            } 
            else if (lastSelected instanceof DraggableImage) {
                ((DraggableImage) lastSelected).deleteImage();

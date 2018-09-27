@@ -141,10 +141,10 @@ public class MetroTopPanel {
     private void initButton(Button button, Pane pane, String icon, String tooltip ) {
         
         // icon
-        button.setGraphic(new ImageView(new Image("file:" + App.app.getDataObject().getString(icon))));
+        button.setGraphic(new ImageView(new Image("file:" + App.app.getProperties().getString(icon))));
         
         // tooltip 
-        button.setTooltip(new Tooltip(App.app.getDataObject().getString(tooltip)));
+        button.setTooltip(new Tooltip(App.app.getProperties().getString(tooltip)));
         // style from css file
         button.getStyleClass().add("button");
         pane.getChildren().add(button);

@@ -16,12 +16,10 @@ import java.util.Optional;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-
 import javax.imageio.ImageIO;
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -33,6 +31,7 @@ import javax.json.JsonWriter;
 import metroApp.App;
 import metroData.MetroData;
 import metroDraggableObjects.Connection;
+import metroDraggableObjects.DraggableImage;
 import metroDraggableObjects.DraggableText;
 import metroDraggableObjects.MetroLine;
 import metroDraggableObjects.Station;
@@ -81,25 +80,6 @@ public class MetroFiles {
         }
     }
 
-    private JsonArrayBuilder saveText() {
-
-        JsonArrayBuilder array = Json.createArrayBuilder();
-        JsonObjectBuilder j = Json.createObjectBuilder();
-
-        ArrayList<DraggableText> text = App.app.getDataComponent().getText();
-        for (int i = 0; i < text.size(); i++) {
-            j.add("content", text.get(i).getText());
-            j.add("font", text.get(i).getFont().getFamily());
-            j.add("fontColor", text.get(i).getColor().toString());
-            j.add("fontSize", text.get(i).getFont().getSize());
-            j.add("bold", text.get(i).isBold());
-            j.add("ital", text.get(i).isItal());
-            j.add("x", text.get(i).getLabel().getTranslateX());
-            j.add("y", text.get(i).getLabel().getTranslateY());
-            array.add(j);
-        }
-        return array;
-    }
 
     private void loadStations(JsonObject jsonFile) {
         for (int i = 0; i < jsonFile.getJsonArray("stations").size(); i++) {
@@ -174,11 +154,10 @@ public class MetroFiles {
     }
 
     private void loadText(JsonObject jsonFile) {
-
+        JsonObject textJson;
         for (int i = 0; i < jsonFile.getJsonArray("text").size(); i++) {
-            JsonObject textJson = jsonFile.getJsonArray("text").getJsonObject(i);
+            textJson = jsonFile.getJsonArray("text").getJsonObject(i);
             DraggableText t = new DraggableText(textJson.getString("content"));
-            App.app.getDataComponent().getText().add(t);
             t.changeFontFamily(textJson.getString("font"));
             t.changeFontSize(textJson.getJsonNumber("fontSize").doubleValue());
             t.changeFontColor(Color.valueOf(textJson.getString("fontColor")));
@@ -194,7 +173,21 @@ public class MetroFiles {
         }
 
     }
-
+    
+    private void loadImages(JsonObject jsonFile) {
+        JsonObject imageJson;
+    
+        for (int i = 0; i < jsonFile.getJsonArray("images").size(); i++) {
+            imageJson = jsonFile.getJsonArray("images").getJsonObject(i);
+            File file = new File(imageJson.getString("path"));
+            DraggableImage d = new DraggableImage(file);
+           
+            d.getImageView().setTranslateX(imageJson.getJsonNumber("x").doubleValue());
+            d.getImageView().setTranslateY(imageJson.getJsonNumber("y").doubleValue());
+        }
+    
+    }
+    
     public void loadFile() throws FileNotFoundException {
 
         App.app.getDataComponent().resetData();
@@ -206,9 +199,24 @@ public class MetroFiles {
         loadStations(jsonFile);
         loadLines(jsonFile);
         loadText(jsonFile);
+        loadImages(jsonFile);
+        
 
         Color c = Color.valueOf(jsonFile.getString("canvasColor"));
         App.app.getWorkspace().getCanvasComponent().setCanvasColor(c);
+        
+        double scale = jsonFile.getJsonNumber("scale").doubleValue();
+        App.app.getWorkspace().getCanvasComponent().getCanvas().setScaleX(scale);
+        App.app.getWorkspace().getCanvasComponent().getCanvas().setScaleY(scale);
+        App.app.getWorkspace().getCanvasComponent().getCanvas().setPrefSize(
+                jsonFile.getJsonNumber("width").doubleValue(),
+                jsonFile.getJsonNumber("height").doubleValue()
+        );
+        App.app.getWorkspace().getCanvasComponent().getCanvas().setLayoutX(
+                jsonFile.getJsonNumber("layoutX").doubleValue());
+        App.app.getWorkspace().getCanvasComponent().getCanvas().setLayoutY(
+                jsonFile.getJsonNumber("layoutY").doubleValue());
+
     }
 
     private JsonObjectBuilder saveStation(Station s) {
@@ -296,10 +304,48 @@ public class MetroFiles {
         }
         return linesJson;
     }
+    
+        private JsonArrayBuilder saveText() {
 
+        JsonArrayBuilder array = Json.createArrayBuilder();
+        JsonObjectBuilder j = Json.createObjectBuilder();
+
+        ArrayList<DraggableText> text = App.app.getDataComponent().getText();
+        for (int i = 0; i < text.size(); i++) {
+            j.add("content", text.get(i).getText());
+            j.add("font", text.get(i).getFont().getFamily());
+            j.add("fontColor", text.get(i).getColor().toString());
+            j.add("fontSize", text.get(i).getFont().getSize());
+            j.add("bold", text.get(i).isBold());
+            j.add("ital", text.get(i).isItal());
+            j.add("x", text.get(i).getLabel().getTranslateX());
+            j.add("y", text.get(i).getLabel().getTranslateY());
+            array.add(j);
+        }
+        return array;
+    }
+
+
+    private JsonArrayBuilder saveImages() {
+               // Deal with lines
+        JsonArrayBuilder imagesJson = Json.createArrayBuilder();
+        JsonObjectBuilder j = Json.createObjectBuilder();
+        
+        ArrayList<DraggableImage> images = App.app.getDataComponent().getImages();
+        for (int i = 0; i < images.size(); i++) {
+            j.add("path", images.get(i).getFile().toPath().toAbsolutePath().toString());
+            j.add("x", images.get(i).getImageView().getTranslateX());
+            j.add("y", images.get(i).getImageView().getTranslateY());
+            imagesJson.add(j);
+        }
+        return imagesJson;
+    
+    }
     public void saveFile() throws FileNotFoundException {
 
         MetroData data = App.app.getDataComponent();
+        
+        
 
         JsonObjectBuilder file = Json.createObjectBuilder();
 
@@ -307,8 +353,19 @@ public class MetroFiles {
         file.add("stations", saveStations());
         file.add("lines", saveLines());
         file.add("text", saveText());
-        file.add("canvasColor",
-                App.app.getWorkspace().getCanvasComponent().getCanvasColor().toString());
+        file.add("images", saveImages());
+        
+        
+        file.add("scale",  App.app.getWorkspace()
+                .getCanvasComponent().getCanvas().getScaleX());
+        file.add("canvasColor", App.app.getWorkspace().getCanvasComponent()
+                .getCanvasColor().toString());
+        
+        file.add("width", App.app.getWorkspace().getCanvasComponent().getCanvas().getPrefWidth());
+        file.add("height", App.app.getWorkspace().getCanvasComponent().getCanvas().getPrefHeight());
+        file.add("layoutX", App.app.getWorkspace().getCanvasComponent().getCanvas().getLayoutX());
+        file.add("layoutY", App.app.getWorkspace().getCanvasComponent().getCanvas().getLayoutY());
+
 
         String name = App.app.getWorkspace().getCurrentFile().getName();
 

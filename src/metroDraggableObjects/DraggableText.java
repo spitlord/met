@@ -60,9 +60,14 @@ public class DraggableText implements ChangeFont {
         
         App.app.getDataComponent().getText().add(this);
         App.app.getWorkspace().getCanvasComponent().getCanvas().getChildren().add(label);
-        
     }
     
+    
+    
+    public void remove() {
+         App.app.getDataComponent().getText().remove(this);
+         App.app.getWorkspace().getCanvasComponent().getCanvas().getChildren().remove(label);
+    }
     
     
       public void changeFontFamily(String family) {
