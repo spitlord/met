@@ -15,14 +15,14 @@ import javafx.scene.text.FontWeight;
 import metroApp.App;
 import metroData.MetroData;
 import metroWorkspace.MetroCanvas;
-import transactions.MoveCircle;
+import transactions.MoveElement;
 import transactions.Transaction;
 
 /**
  *
  * @author XDXD
  */
-public class Station implements ChangeFont {
+public class Station implements ChangableFont, ChangableColor, Movable {
     
     
     final static int labelDistance = 25;
@@ -40,21 +40,19 @@ public class Station implements ChangeFont {
     int labelRotation;
     ArrayList<MetroLine> lines;
     ArrayList<Station> neighbors;
-    boolean lineEndNameStation;
     
     
     public Station(String name) {
         
         
        
-        lineEndNameStation = false;
         
         MetroCanvas metroCanvas = App.app.getWorkspace().getCanvasComponent();
         
         // all the lines that have this station
 
-        neighbors = new ArrayList<Station>();
-        lines =  new ArrayList<MetroLine>();
+        neighbors = new ArrayList();
+        lines =  new ArrayList();
         
         // set name
         this.name = name;
@@ -84,7 +82,7 @@ public class Station implements ChangeFont {
         // on dragged change location
  
         circle.setOnMousePressed(e -> {
-              App.app.getTransactions().pushUndo(new MoveCircle(circle));    
+              App.app.getTransactions().pushUndo(new MoveElement(this));    
         });
         
         circle.setOnMouseDragged(e -> {
@@ -95,10 +93,10 @@ public class Station implements ChangeFont {
         
         circle.setOnMouseReleased(e -> {
               Transaction temp = App.app.getTransactions().peekUndo();
-              if (temp instanceof MoveCircle) {
-                  if (((MoveCircle) temp).getC() == circle &&
-                       ((MoveCircle) temp).getX() == circle.getCenterX() &&
-                       ((MoveCircle) temp).getY() == circle.getCenterY()) {
+              if (temp instanceof MoveElement) {
+                  if (((MoveElement) temp).getMovable() == this &&
+                       ((MoveElement) temp).getX() == circle.getCenterX() &&
+                       ((MoveElement) temp).getY() == circle.getCenterY()) {
                       App.app.getTransactions().popUndoWithouAction();
                   }
               }
@@ -129,7 +127,7 @@ public class Station implements ChangeFont {
    
         App.app.getWorkspace().getLeftPanel().getFontFamily().setValue(label.getFont().getFamily());
         App.app.getWorkspace().getLeftPanel().getFontSize().setValue((int)label.getFont().getSize());
-        if (!(name.charAt(0) == ' ')) {
+        if (!isEndOfTheLine()) {
             App.app.getDataComponent().getMetroStations().add(this);
             App.app.getDataComponent().setSelectedStation(this);
              // update combobox
@@ -137,10 +135,13 @@ public class Station implements ChangeFont {
         } 
         
     }
-    
+    private boolean isEndOfTheLine() {
+        return name.charAt(0) == ' ';
+        
+    }
     
     public void deleteStation() {
-        if (!lineEndNameStation) {
+        if (!isEndOfTheLine()) {
             MetroData data = App.app.getDataComponent();
             
              // remove from all lines
@@ -168,10 +169,6 @@ public class Station implements ChangeFont {
         }
 }
 
-    public void setLineEndNameStation(boolean lineEndNameStation) {
-        this.lineEndNameStation = lineEndNameStation;
-    }
-    
     
     
     public Circle getCircle() {
@@ -206,6 +203,7 @@ public class Station implements ChangeFont {
         this.bold = bold;
     }
     
+ 
     
     
     
@@ -317,12 +315,13 @@ public class Station implements ChangeFont {
 
     public int getLabelRotation() {
         return labelRotation;
+        
     }
     
     
     
     
-    public void changeCircleFill(Color c) {
+    public void changeColor(Color c) {
         color = c;
         circle.setFill(color);
     }
@@ -375,7 +374,35 @@ public class Station implements ChangeFont {
     public ArrayList<Station> getNeighbors() {
         return neighbors;
     }
-      
+
+    @Override
+    public void setX(double x) {
+        circle.setCenterX(x);
+    }
+    @Override
+    public void setY(double y) {
+        circle.setCenterY(y);
+    }
+
+    @Override
+    public double getX() {
+        return circle.getCenterX();    
+    }
+
+    @Override
+    public double getY() {
+        return circle.getCenterY();
+    }
+
+    @Override
+    public Movable getMovable() {
+        return this;
+    }
+    
+    
+    
+    
+    
       
      
    

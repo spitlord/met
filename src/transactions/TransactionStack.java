@@ -87,14 +87,5 @@ public class TransactionStack {
     }
     
     
- 
-    
-
-    public void undoTransaction() {
-    }
-
-    public void redoTransaction() {
-
-    }
 
 }

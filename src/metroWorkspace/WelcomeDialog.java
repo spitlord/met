@@ -105,8 +105,7 @@ public class WelcomeDialog {
                                                     OutputStream out;
                                                     out = new FileOutputStream(file);
                                                     // a new file was created
-                                                    workspace.setFileInWorkSpace(true);
-                                                    workspace.setCurrentFile(file);
+                                                    App.app.getDataComponent().setCurrentFile(file);
                                                     
                                                     out.close();
                                                 }
@@ -156,21 +155,18 @@ public class WelcomeDialog {
                box.getChildren().add(label);
                // set action
                label.setOnMouseClicked(e -> {
-                   workspace.setFileInWorkSpace(true);
-                   workspace.setCurrentFile(f);
-                   
-
                     try {
-                         App.app.getFileComponent().loadFile();
+                         App.app.getFileComponent().loadFile(f);
+                         System.out.println("oeueu");
+                         App.app.getDataComponent().setCurrentFile(f);
+                         System.out.println("thnth");
+
                      } catch (Exception ex) {
                      System.out.println("No lead ");
-                               }
-
-                   
-                   // later implement loading;
-                   // now just an alert
-                   stage.close();    
-                   
+                     }
+                    
+                   stage.close();
+               
                });
              
            }

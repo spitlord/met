@@ -34,10 +34,7 @@ public class MetroWorkspace {
     
     // assists the construction of WelcomeDialogue
     ArrayList recentFiles;
-    private boolean fileInWorkSpace;
     
-    File currentFile;
-
     
     
     public MetroWorkspace() {
@@ -49,9 +46,7 @@ public class MetroWorkspace {
     public void initWorkspace() {
         
         // there is no file in the workspace yet
-        setFileInWorkSpace(false);    
-        
-        
+
         // container for canvas and panels
         BorderPane root = new BorderPane();
         App.app.setScene(new Scene(root, 1000, 750));
@@ -109,28 +104,18 @@ public class MetroWorkspace {
     /**
      * @return the fileInWorkSpace
      */
-    public boolean isFileInWorkSpace() {
-        return fileInWorkSpace;
-    }
+ 
 
     /**
      * @param fileInWorkSpace the fileInWorkSpace to set
      */
-    public void setFileInWorkSpace(boolean fileInWorkSpace) {
-        this.fileInWorkSpace = fileInWorkSpace;
-    }
 
     public MetroLeftPanel getLeftPanel() {
         return leftPanel;
     }
 
-    public File getCurrentFile() {
-        return currentFile;
-    }
 
-    public void setCurrentFile(File currentFile) {
-        this.currentFile = currentFile;
-    }
+   
     
     public MetroCanvas getCanvasComponent() {
         return canvasComponent;

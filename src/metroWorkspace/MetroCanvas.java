@@ -5,8 +5,6 @@
  */
 package metroWorkspace;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javafx.scene.Group;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
@@ -42,9 +40,7 @@ public class MetroCanvas {
         return canvasHolder;
     }
 
-    /**
-     * @return the canvas
-     */
+
     public Pane getCanvas() {
         return canvas;
     }

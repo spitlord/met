@@ -22,13 +22,13 @@ import metroWorkspace.MetroCanvas;
  *
  * @author XDXD
  */
-public class MetroLine {
+public class MetroLine implements ChangableColor {
     private String name;
     private boolean circular;
     ArrayList<Station> stations;
     ArrayList<Connection> connections;
-    private Station beginning;
-    private Station end;
+    private final Station beginning;
+    private final Station end;
     double lineThickness;
     Color color;
     
@@ -335,7 +335,8 @@ public class MetroLine {
         }
     }
 
-    public void changeLineColor(Color c) {
+    @Override
+    public void changeColor(Color c) {
         this.color = c;
 
         for (int i = 0; i < connections.size(); i++) {
@@ -381,6 +382,16 @@ public class MetroLine {
         
     }
     
+    public void hideEnds() {
+        beginning.circle.setVisible(false);
+        end.circle.setVisible(false);
+    }
+    
+    public void showEnds() {
+        beginning.circle.setVisible(true);
+        end.circle.setVisible(true);
+    }
+    
     
     
     
@@ -414,11 +425,12 @@ public class MetroLine {
    
     
     public void editLine(Color c, String newName) {
-        changeLineColor(c);
+        changeColor(c);
         name = newName;
         beginning.label.setText(name);
     }
-    
+
+
     
     
     

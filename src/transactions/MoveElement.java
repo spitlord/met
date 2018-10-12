@@ -5,29 +5,29 @@
  */
 package transactions;
 
-import javafx.scene.shape.Circle;
+import metroDraggableObjects.Movable;
 
 /**
  *
  * @author spitlord
  */
-public class MoveCircle implements Transaction {
-    Circle c;
+public class MoveElement implements Transaction {
+    Movable m;
     double x, y;
 
-    public MoveCircle(Circle c) {
-        this.c = c;
-        this.x = c.getCenterX();
-        this.y = c.getCenterY();
+    public MoveElement(Movable m) {
+        this.m = m;
+        this.x = m.getX();
+        this.y = m.getY();
     }
 
     @Override
     public void undo() {
         double tempX, tempY;
-        tempX = c.getCenterX();
-        tempY = c.getCenterY();
-        c.setCenterX(x);
-        c.setCenterY(y);
+        tempX = m.getX();
+        tempY = m.getY();
+        m.setX(x);
+        m.setY(y);
         x = tempX;
         y = tempY;        
     }
@@ -45,9 +45,10 @@ public class MoveCircle implements Transaction {
         return y;
     }
 
-    public Circle getC() {
-        return c;
+    public Movable getMovable() {
+        return m;
     }
+
     
     
     

@@ -10,7 +10,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Optional;
 import javafx.collections.ObservableList;
@@ -30,6 +29,7 @@ import javax.json.JsonReader;
 import javax.json.JsonWriter;
 import metroApp.App;
 import metroData.MetroData;
+import metroDraggableObjects.Background;
 import metroDraggableObjects.Connection;
 import metroDraggableObjects.DraggableImage;
 import metroDraggableObjects.DraggableText;
@@ -60,10 +60,8 @@ public class MetroFiles {
                 if (!file.exists()) {
                     OutputStream out;
                     out = new FileOutputStream(file);
-                    App.app.getWorkspace().setFileInWorkSpace(true);
                     App.app.getWorkspace().getLeftPanel().getLeftPanel().setDisable(false);
-                    App.app.getWorkspace().setCurrentFile(file);
-
+                    App.app.getDataComponent().setCurrentFile(file);
                     out.close();
 
                 } else {
@@ -86,7 +84,7 @@ public class MetroFiles {
             JsonObject stationJson = jsonFile.getJsonArray("stations").getJsonObject(i);
 
             Station station = new Station(stationJson.getString("name"));
-            station.changeCircleFill(Color.valueOf(stationJson.getString("color")));
+            station.changeColor(Color.valueOf(stationJson.getString("color")));
             station.getCircle().setRadius(stationJson.getJsonNumber("radius").doubleValue());
             station.changeFontFamily(stationJson.getString("font"));
             station.changeFontSize(stationJson.getJsonNumber("fontSize").doubleValue());
@@ -110,7 +108,7 @@ public class MetroFiles {
         for (int i = 0; i < jsonFile.getJsonArray("lines").size(); i++) {
             JsonObject lineJson = jsonFile.getJsonArray("lines").getJsonObject(i);
             MetroLine line = new MetroLine(lineJson.getString("name"));
-            line.changeLineColor(Color.valueOf(lineJson.getString("color")));
+            line.changeColor(Color.valueOf(lineJson.getString("color")));
 
             line.getBeginning().changeFontSize(lineJson.getJsonNumber("fontSize").doubleValue());
 
@@ -188,18 +186,28 @@ public class MetroFiles {
     
     }
     
-    public void loadFile() throws FileNotFoundException {
+     private void loadBackground(JsonObject jsonFile) {
+        String b = jsonFile.getString("background");
+        if (b.equals("none"));
+        else {
+            Background background = new Background(new File(b));
+        }
+    
+    
+    }
+    
+    public void loadFile(File currentFile) throws FileNotFoundException {
 
         App.app.getDataComponent().resetData();
-        File currentFile = App.app.getWorkspace().getCurrentFile();
+        App.app.getDataComponent().setCurrentFile(currentFile);
         FileInputStream os = new FileInputStream(currentFile);
         JsonReader reader = Json.createReader(os);
         JsonObject jsonFile = reader.readObject();
-
         loadStations(jsonFile);
         loadLines(jsonFile);
         loadText(jsonFile);
         loadImages(jsonFile);
+        loadBackground(jsonFile);
         
 
         Color c = Color.valueOf(jsonFile.getString("canvasColor"));
@@ -341,6 +349,16 @@ public class MetroFiles {
         return imagesJson;
     
     }
+    
+    private String saveBackground() {
+        Background b = App.app.getDataComponent().getBackground();
+        if (b == null) {
+            return "none";
+        }
+        else return App.app.getDataComponent().getBackground()
+                .getFile().toPath().toAbsolutePath().toString();
+    }
+    
     public void saveFile() throws FileNotFoundException {
 
         MetroData data = App.app.getDataComponent();
@@ -354,6 +372,7 @@ public class MetroFiles {
         file.add("lines", saveLines());
         file.add("text", saveText());
         file.add("images", saveImages());
+        file.add("background", saveBackground());
         
         
         file.add("scale",  App.app.getWorkspace()
@@ -367,9 +386,9 @@ public class MetroFiles {
         file.add("layoutY", App.app.getWorkspace().getCanvasComponent().getCanvas().getLayoutY());
 
 
-        String name = App.app.getWorkspace().getCurrentFile().getName();
+        String name = App.app.getDataComponent().getCurrentFile().getName();
 
-        File currentFile = App.app.getWorkspace().getCurrentFile();
+        File currentFile = App.app.getDataComponent().getCurrentFile();
 
         FileOutputStream os = new FileOutputStream(currentFile);
 
@@ -397,7 +416,7 @@ public class MetroFiles {
 
         WritableImage writableImage = new WritableImage((int) pane.getWidth(), (int) pane.getHeight());
         pane.snapshot(null, writableImage);
-        String name = App.app.getWorkspace().getCurrentFile().getName();
+        String name = App.app.getDataComponent().getCurrentFile().getName();
         name = name.replace(".json", "");
         File outFile = new File("src/exp/" + name + ".png");
 

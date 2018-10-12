@@ -5,20 +5,22 @@
  */
 package metroDraggableObjects;
 
+import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 /**
  *
- * @author XDXD
+ * @author spitlord
  */
-public interface ChangeFont {
+public interface ChangableFont {
     
+ 
     public void changeFontBold();
     public void changeFontItal();
     public void changeFontSize(double d);
     public void changeFontFamily(String s);
     public void changeFontColor(Color c);
-    
-            
+    public Label getLabel();
     
 }

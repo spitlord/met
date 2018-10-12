@@ -9,12 +9,14 @@ import java.io.File;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import metroApp.App;
+import transactions.MoveElement;
+import transactions.Transaction;
 
 /**
  *
  * @author XDXD
  */
-public class DraggableImage {
+public class DraggableImage implements Movable {
     
 
     double startX, startY, translateX, translateY;
@@ -31,6 +33,7 @@ public class DraggableImage {
         App.app.getDataComponent().getImages().add(this);
         
         imageView.setOnMousePressed(e -> {
+            App.app.getTransactions().pushUndo(new MoveElement(this));
             startX = e.getSceneX();
             startY = e.getSceneY();
             
@@ -48,6 +51,16 @@ public class DraggableImage {
             imageView.setTranslateX(finalTranslateX);
             imageView.setTranslateY(finalTranslateY);
             e.consume();
+        });
+        imageView.setOnMouseReleased(e -> {
+              Transaction temp = App.app.getTransactions().peekUndo();
+              if (temp instanceof MoveElement) {
+                  if (((MoveElement) temp).getMovable() == this &&
+                       ((MoveElement) temp).getX() == imageView.getTranslateX() &&
+                       ((MoveElement) temp).getY() == imageView.getTranslateY()) {
+                      App.app.getTransactions().popUndoWithouAction();
+                  }
+              }
         });
     }
     
@@ -67,6 +80,32 @@ public class DraggableImage {
     public File getFile() {
         return file;
     }
+    
+    
+     
+    @Override
+    public void setX(double x) {
+         imageView.setTranslateX(x);
+    }
+    @Override
+    public void setY(double y) {
+         imageView.setTranslateY(y);
+    }
+
+    @Override
+    public double getX() {
+         return imageView.getTranslateX();    }
+
+    @Override
+    public double getY() {
+        return imageView.getTranslateY();
+    }
+
+    @Override
+    public Movable getMovable() {
+        return this;
+    }
+    
     
     
     

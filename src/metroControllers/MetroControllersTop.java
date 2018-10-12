@@ -11,8 +11,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Alert;
@@ -21,6 +19,9 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import metroApp.App;
 
@@ -41,7 +42,7 @@ public class MetroControllersTop {
         // propose to save the current one (if there is)
         // before making a new one
         
-        if (App.app.getWorkspace().isFileInWorkSpace() == true) {
+        if (App.app.getDataComponent().getCurrentFile() != null) {
             
             Alert alert = new Alert(AlertType.NONE, "Save current file?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
             alert.showAndWait();
@@ -51,14 +52,13 @@ public class MetroControllersTop {
                 
                 try {
                     App.app.getFileComponent().saveFile();
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(MetroControllersTop.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception ex) {
+                    System.out.println("suka");
                 }
-                
-                
-            }   
+            }
+            if (alert.getResult() == ButtonType.CANCEL) return;
         }
-            //
+        
             try {
             App.app.getDataComponent().resetData();
             } catch (NullPointerException ex) {}
@@ -67,11 +67,18 @@ public class MetroControllersTop {
     
     
     public void handleLoadButton() {
-      try {
-            App.app.getFileComponent().loadFile();
-        } catch (FileNotFoundException ex) {
-           // Logger.getLogger(MetroControllersTop.class.getName()).log(Level.SEVERE, null, ex);
-        }}
+        
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose file");
+        File file = fileChooser.showOpenDialog(App.app.getStage());
+        try {
+            App.app.getFileComponent().loadFile(file);
+        } catch (Exception x){}
+    }
+    
+    
+    
+    
     public void handleSaveButton() {
         try {
             App.app.getFileComponent().saveFile();
@@ -80,9 +87,14 @@ public class MetroControllersTop {
         }
         
     }
-    public void handleSaveAsButton() {}
+    public void handleSaveAsButton() {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("JavaFX Projects");
+        File selectedDirectory = chooser.showDialog(App.app.getStage());
+        
+    }
     
-
+    
     public void handleUndoButton() {
         App.app.getTransactions().popUndo();
     }
@@ -145,7 +157,6 @@ public class MetroControllersTop {
                 if (!file.exists()) {
                     OutputStream out;
                     out = new FileOutputStream(file);
-                    App.app.getWorkspace().setFileInWorkSpace(true);
                     App.app.getWorkspace().getLeftPanel().getLeftPanel().setDisable(false);
 
                     out.close();
@@ -182,7 +193,7 @@ public class MetroControllersTop {
 
   
     
-    File file = App.app.getWorkspace().getCurrentFile();
+    File file = App.app.getDataComponent().getCurrentFile();
             new File("src/exp/" + file.getName() + ".png");
 
     try {

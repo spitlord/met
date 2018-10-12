@@ -10,22 +10,25 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.QuadCurve;
 import metroApp.App;
 import metroWorkspace.MetroCanvas;
-import transactions.MoveCircle;
+import transactions.MoveElement;
 import transactions.Transaction;
 
 /**
  *
  * @author XDXD
  */
-public class Connection {
-
- 
+public class Connection implements Movable {
+    
+    
     QuadCurve connectionCurve;
     MetroLine metroLine;
     Circle control;
     Station a, b;
+    double distance;
     
-    Connection() {}
+    Connection() {
+        
+    }
 
 
     public Connection(MetroLine metroLine) {
@@ -76,14 +79,13 @@ public class Connection {
         connectionCurve.setOnMouseClicked(e -> {
             // show the control circle and select the metroLine
             if (e.getTarget() == connectionCurve) {
-                control.setVisible(true);
                 
                 // select line that connection belongs to
                 App.app.getDataComponent().setSelectedLine(metroLine);
                 
                 // show the line ends
-                metroLine.getBeginning().getCircle().setVisible(true);
-                metroLine.getEnd().getCircle().setVisible(true);
+                metroLine.showEnds();
+ 
                 
                 // unselect the previous control circle!
                 try {
@@ -110,7 +112,7 @@ public class Connection {
         });
         
      control.setOnMousePressed(e -> {
-              App.app.getTransactions().pushUndo(new MoveCircle(control));    
+              App.app.getTransactions().pushUndo(new MoveElement(this));    
         });
         control.setOnMouseDragged(e -> {
         control.setCenterX(e.getX()+2);
@@ -120,11 +122,11 @@ public class Connection {
         
        control.setOnMouseReleased(e -> {
               Transaction temp = App.app.getTransactions().peekUndo();
-              if (temp instanceof MoveCircle) {
+              if (temp instanceof MoveElement) {
                   if (
-                      ((MoveCircle) temp).getC() == control &&
-                      ((MoveCircle) temp).getX() == control.getCenterX() &&
-                      ((MoveCircle) temp).getY() == control.getCenterY()) {
+                      ((MoveElement) temp).getMovable() == this &&
+                      ((MoveElement) temp).getX() == control.getCenterX() &&
+                      ((MoveElement) temp).getY() == control.getCenterY()) {
                       App.app.getTransactions().popUndoWithouAction();
                   }
               }
@@ -165,8 +167,59 @@ public class Connection {
     public QuadCurve getConnectionCurve() {
         return connectionCurve;
     }
-
     
+    public void hideControl() {
+        control.setVisible(false);
+    }
+    
+    public void showControl() {
+        control.setVisible(true);
+    }
+    
+    public double approximateLength() {
+        double ax = a.getCircle().getCenterX();
+        double ay = a.getCircle().getCenterY();
+        
+        double bx = b.getCircle().getCenterX();
+        double by = b.getCircle().getCenterY();
+        
+        double cx = control.getCenterX();
+        double cy = control.getCenterY();
+        
+        
+        
+        
+        return 0;
+    }
+    
+    
+    @Override
+    public void setX(double x) {
+        control.setCenterX(x);
+    }
+    @Override
+    public void setY(double y) {
+        control.setCenterY(y);
+    }
+
+    @Override
+    public double getX() {
+        return control.getCenterX();    
+    }
+
+    @Override
+    public double getY() {
+        return control.getCenterY();
+    }
+
+    @Override
+    public Movable getMovable() {
+        return this;
+    }
+    
+    
+
+   
     
    
     

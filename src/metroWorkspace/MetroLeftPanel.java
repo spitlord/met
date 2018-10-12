@@ -612,8 +612,14 @@ public class MetroLeftPanel {
     public ComboBox getFontFamily() {
         return fontFamily;
     }
+
+    public ComboBox getFromComboBox() {
+        return fromComboBox;
+    }
     
-    
+     public ComboBox getToComboBox() {
+        return toComboBox;
+    }
 
     public ComboBox getLineComboBox() {
         return lineComboBox;
