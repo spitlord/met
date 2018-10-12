@@ -11,12 +11,14 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import metroApp.App;
+import transactions.MoveElement;
+import transactions.Transaction;
 
 /**
  *
  * @author XDXD
  */
-public class DraggableText implements ChangeFont {
+public class DraggableText implements ChangableFont, Movable {
     
     Label label;
     boolean bold;
@@ -36,6 +38,7 @@ public class DraggableText implements ChangeFont {
         // color
         
         label.setOnMousePressed(e -> {
+            App.app.getTransactions().pushUndo(new MoveElement(this));
             App.app.getWorkspace().getLeftPanel().getFontFamily().setValue(label.getFont().getFamily());
             App.app.getWorkspace().getLeftPanel().getFontSize().setValue((int)label.getFont().getSize());
             startX = e.getSceneX();
@@ -57,7 +60,16 @@ public class DraggableText implements ChangeFont {
             
             e.consume();
         });
-        
+        label.setOnMouseReleased(e -> {
+              Transaction temp = App.app.getTransactions().peekUndo();
+              if (temp instanceof MoveElement) {
+                  if (((MoveElement) temp).getMovable() == this &&
+                       ((MoveElement) temp).getX() == label.getTranslateX() &&
+                       ((MoveElement) temp).getY() == label.getTranslateY()) {
+                      App.app.getTransactions().popUndoWithouAction();
+                  }
+              }
+        });
         App.app.getDataComponent().getText().add(this);
         App.app.getWorkspace().getCanvasComponent().getCanvas().getChildren().add(label);
     }
@@ -137,6 +149,32 @@ public class DraggableText implements ChangeFont {
     public Label getLabel() {
         return label;
     }
+    
+    
+    @Override
+    public void setX(double x) {
+         label.setTranslateX(x);
+    }
+    @Override
+    public void setY(double y) {
+         label.setTranslateY(y);
+    }
+
+    @Override
+    public double getX() {
+         return label.getTranslateX();    }
+
+    @Override
+    public double getY() {
+        return label.getTranslateY();
+    }
+
+    @Override
+    public Movable getMovable() {
+        return this;
+    }
+    
+    
     
     
     
