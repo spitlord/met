@@ -5,7 +5,7 @@
  */
 package metroData;
 
-import metroDraggableObjects.Station;
+import canvasObjects.Station;
 
 /**
  *

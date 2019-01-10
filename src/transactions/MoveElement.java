@@ -5,31 +5,38 @@
  */
 package transactions;
 
-import metroDraggableObjects.Movable;
+import canvasObjects.Movable;
 
 /**
  *
  * @author spitlord
  */
 public class MoveElement implements Transaction {
-    Movable m;
-    double x, y;
+    Movable[] movables;
+    double [] xs;
+    double [] ys;
 
-    public MoveElement(Movable m) {
-        this.m = m;
-        this.x = m.getX();
-        this.y = m.getY();
+    public MoveElement(Movable ... movables) {
+        this.movables = movables;
+        this.xs = new double[movables.length];
+        this.ys = new double[movables.length];
+        for (int i = 0; i < movables.length; i++) {
+            xs[i] = movables[i].getX();
+            ys[i] = movables[i].getY();       
+        }
     }
 
     @Override
     public void undo() {
         double tempX, tempY;
-        tempX = m.getX();
-        tempY = m.getY();
-        m.setX(x);
-        m.setY(y);
-        x = tempX;
-        y = tempY;        
+        for (int i = 0; i < movables.length; i++) {
+        tempX = movables[i].getX();
+        tempY = movables[i].getY();
+        movables[i].setX(xs[i]);
+        movables[i].setY(ys[i]);
+        xs[i] = tempX;
+        ys[i] = tempY; 
+        }
     }
 
     @Override
@@ -38,15 +45,15 @@ public class MoveElement implements Transaction {
     }
 
     public double getX() {
-        return x;
+        return xs[0];
     }
 
     public double getY() {
-        return y;
+        return ys[0];
     }
 
     public Movable getMovable() {
-        return m;
+        return movables[0];
     }
 
     

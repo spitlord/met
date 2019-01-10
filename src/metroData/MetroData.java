@@ -11,12 +11,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 import metroApp.App;
-import metroDraggableObjects.Background;
-import metroDraggableObjects.Connection;
-import metroDraggableObjects.DraggableImage;
-import metroDraggableObjects.DraggableText;
-import metroDraggableObjects.MetroLine;
-import metroDraggableObjects.Station;
+import canvasObjects.Background;
+import canvasObjects.Connection;
+import canvasObjects.DraggableImage;
+import canvasObjects.Text;
+import canvasObjects.MetroLine;
+import canvasObjects.Station;
 
 /**
  *
@@ -28,7 +28,7 @@ public class MetroData {
     private final ObservableList<Station> metroStations;
     private final ObservableList<String> fontFamilies;
     private final ObservableList<Integer> fontSizes;
-    private final ArrayList<DraggableText> text;
+    private final ArrayList<Text> text;
     private final ArrayList<DraggableImage> images;
     private Background background;
 
@@ -36,20 +36,22 @@ public class MetroData {
     private Station selectedStation;
     private Connection selectedConnection;
     private Object lastSelectedElement;
+    private Color currentStationColor;
     private File currentFile;
 
     public MetroData() {
 
         // observable lists are for comboboxes
+
         metroLines = FXCollections.observableArrayList();
         metroStations = FXCollections.observableArrayList();
         text = new ArrayList();
         images = new ArrayList();
         fontFamilies = FXCollections.observableArrayList();
         fontFamilies.addAll("Arial", "Courier", "PT Sans", "PT Serif", "Times New Roman");
-
         fontSizes = FXCollections.observableArrayList();
         fontSizes.addAll(8, 10, 11, 12, 14, 16, 18, 20, 24, 28, 36, 48);
+        currentStationColor = Color.BLACK;
 
     }
 
@@ -175,7 +177,7 @@ public class MetroData {
         }
     }
 
-    public ArrayList<DraggableText> getText() {
+    public ArrayList<Text> getText() {
         return text;
     }
 
@@ -195,6 +197,21 @@ public class MetroData {
         return currentFile;
     }
 
+    public Color getCurrentStationColor() {
+        return currentStationColor;
+    }
+
+    public void setCurrentStationColor(Color currentStationColor) {
+        this.currentStationColor = currentStationColor;
+    }
+    
+    public void addStation(Station s) {
+        metroStations.add(s);
+    }
+    
+     public boolean removeStation(Station s) {
+        return metroStations.remove(s);
+    }
     
     
 }

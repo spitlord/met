@@ -30,62 +30,58 @@ public class TransactionStack {
         undoStack.add(transaction);
         redoStack.clear();
     }
-    
-    public void pushUndoFromRedo(Transaction transaction) {
+
+    private void pushUndoFromRedo(Transaction transaction) {
 
         if (undoStack.size() >= UNDO_LIMIT) {
             undoStack.remove(0);
         }
         undoStack.add(transaction);
     }
-    
-    public Transaction peekUndo() {
-        return undoStack.get(undoStack.size()-1);
-    }
-    
-    
-    public void popUndoWithouAction() {
-         undoStack.remove(undoStack.size()-1);
-    }
-    
 
+    public Transaction peekUndo() {
+        return undoStack.get(undoStack.size() - 1);
+    }
+
+    public void popUndoWithouAction() {
+        undoStack.remove(undoStack.size() - 1);
+    }
+    
+    
     public Transaction popUndo() {
-        if (undoStack.size() == 0) return null;
+        if (undoStack.isEmpty()) {
+            return null;
+        }
         if (undoStack.size() >= UNDO_LIMIT) {
             undoStack.remove(0);
         }
-       
-        
+
         Transaction t = undoStack.remove(undoStack.size() - 1);
         t.undo();
         pushRedo(t);
-
         return t;
 
     }
 
-    public void pushRedo(Transaction transaction) {
-       
+    private void pushRedo(Transaction transaction) {
 
         if (redoStack.size() >= UNDO_LIMIT) {
-            undoStack.remove(0);
+            redoStack.remove(0);
         }
         redoStack.add(transaction);
     }
 
     public Transaction popRedo() {
-        if (redoStack.size() == 0) return null;
+        
+        if (redoStack.isEmpty()) {
+            return null;
+        }
         if (redoStack.size() >= UNDO_LIMIT) {
             redoStack.remove(0);
         }
-        
-        Transaction t = redoStack.remove(redoStack.size()-1);
+        Transaction t = redoStack.remove(redoStack.size() - 1);
         t.redo();
         pushUndoFromRedo(t);
         return t;
-        
     }
-    
-    
-
 }

@@ -5,6 +5,7 @@
  */
 package metroControllers;
 
+import canvasObjects.Addable;
 import java.io.File;
 import java.util.Optional;
 import javafx.scene.Scene;
@@ -15,20 +16,29 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import metroApp.App;
 import metroData.MetroData;
-import metroDraggableObjects.Background;
-import metroDraggableObjects.DraggableImage;
-import metroDraggableObjects.DraggableText;
-import metroDraggableObjects.MetroLine;
-import metroDraggableObjects.Station;
-import metroDraggableObjects.ChangableFont;
+import canvasObjects.Background;
+import canvasObjects.DraggableImage;
+import canvasObjects.Text;
+import canvasObjects.MetroLine;
+import canvasObjects.Station;
+import canvasObjects.ChangableFont;
+import handlers.CustomAlerts;
+import transactions.AddObjectT;
+import transactions.AddStationToLineT;
+import workspace.MouseState;
+import transactions.BackgroundColor;
 import transactions.ChangeFont;
+import transactions.EditLine;
+import transactions.EditStation;
+import transactions.RemoveObjectT;
+import transactions.RemoveStationFromLineT;
+import transactions.RemoveStationT;
 
 /**
  *
@@ -37,40 +47,34 @@ import transactions.ChangeFont;
 public class MetroControllersLeft {
 
     public MetroControllersLeft() {
-
     }
 
-    //// Left Panel
     public void handleAddLineButton() {
-
         //prompt for name
         TextInputDialog a = new TextInputDialog();
         a.setTitle("Add a line");
         a.setHeaderText("Enter name: ");
-
         Optional<String> result = a.showAndWait();
-
         // discard null string and cancel or close button
         if (result.isPresent() && !(result.get().equals(""))) {
             MetroLine newLine = new MetroLine(result.get());
+//            newLine.add();
+            App.app.getTransactions().pushUndo(new AddObjectT(newLine));
         }
     }
 
     public void handleRemoveLineButton() {
-
         try {
-            // test whether any line is selected;
-            // null thrown and code doesn't proceed
             MetroLine line = App.app.getDataComponent().getSelectedLine();
-
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete this line?", ButtonType.YES, ButtonType.CANCEL);
             alert.showAndWait();
-
             if (alert.getResult() == ButtonType.YES) {
-                line.deleteLine();
+                line.remove();
+                App.app.getDataComponent().setSelectedLine(null);
+                App.app.getTransactions().pushUndo(new RemoveObjectT(line));
+                
             }
         } catch (NullPointerException ex) {
-
         }
 
     }
@@ -78,6 +82,7 @@ public class MetroControllersLeft {
     public void handleEditLineButton() {
         MetroLine line = App.app.getDataComponent().getSelectedLine();
         if (line != null) {
+            App.app.getTransactions().pushUndo(new EditLine(line));
             TextArea textArea = new TextArea();
             textArea.setText(line.getName());
 
@@ -87,7 +92,6 @@ public class MetroControllersLeft {
             GridPane gridBox = new GridPane();
             gridBox.add(textArea, 0, 0);
             gridBox.add(colorPicker, 1, 0);
-
             Button OKButton = new Button("OK");
             Button cancel = new Button("Cancel");
             gridBox.add(OKButton, 0, 1);
@@ -110,6 +114,7 @@ public class MetroControllersLeft {
                 e.consume();
             });
             cancel.setOnMouseClicked(e -> {
+                App.app.getTransactions().popUndoWithouAction();
                 stage.close();
             });
             stage.showAndWait();
@@ -121,21 +126,21 @@ public class MetroControllersLeft {
     }
 
     public void handleAddStationsToLineButton() {
-
         try {
-            Station selectedStation = App.app.getDataComponent().getSelectedStation();
-            MetroLine selectedLine = App.app.getDataComponent().getSelectedLine();
-            selectedLine.addStationToTheLine(selectedStation);
+            Station station = App.app.getDataComponent().getSelectedStation();
+            MetroLine line = App.app.getDataComponent().getSelectedLine();
+            line.addStationNearest(station);
+            App.app.getTransactions().pushUndo(new AddStationToLineT(line, station));
         } catch (NullPointerException ex) {
         }
-
     }
 
     public void handleRemoveStationsFromLineButton() {
         try {
-            Station selectedStation = App.app.getDataComponent().getSelectedStation();
-            MetroLine selectedLine = App.app.getDataComponent().getSelectedLine();
-            selectedLine.removeStationFromTheLine(selectedStation);
+            Station station = App.app.getDataComponent().getSelectedStation();
+            MetroLine line = App.app.getDataComponent().getSelectedLine();
+            line.removeStationFromLine(station);
+            App.app.getTransactions().pushUndo(new RemoveStationFromLineT(line, station));
         } catch (NullPointerException ex) {
         }
     }
@@ -144,8 +149,7 @@ public class MetroControllersLeft {
         try {
             MetroLine line = App.app.getDataComponent().getSelectedLine();
             // i = 1, because at 0 there is a dragging node;
-            line.listStations();
-
+            CustomAlerts.listStations(line);
         } catch (NullPointerException e) {
         }
     }
@@ -156,16 +160,31 @@ public class MetroControllersLeft {
 
     public void handleSetLineColor(Color c) {
         try {
-            App.app.getDataComponent().getSelectedLine().changeColor(c);
+            MetroLine line = App.app.getDataComponent().getSelectedLine();
+            App.app.getTransactions().pushUndo(new EditLine(line));
+            line.changeColor(c);
         } catch (NullPointerException ex) {
         }
     }
 
-    public void handleSetLineThickness(double thickness) {
-        try {
-            App.app.getDataComponent().getSelectedLine().changeLineThickness(thickness);
-        } catch (NullPointerException ex) {
+    public void handleSetLineThickness(MouseState state, double thickness) {
+        if (!(App.app.getDataComponent().getSelectedLine() == null)) {
+            MetroLine line = App.app.getDataComponent().getSelectedLine();
+            switch (state) {
+                case PRESSED:
+                    App.app.getTransactions().pushUndo(new EditLine(line));
+                    break;
+                case RELEASED:
+                    EditLine transaction = (EditLine) App.app.getTransactions().peekUndo();
+                    if (transaction.getThickness() == line.getLineThickness()) {
+                        App.app.getTransactions().popUndoWithouAction();
+                    }
+                    break;
+
+            }
+            line.changeLineThickness(thickness);
         }
+
     }
 
     public void handleAddStationButton() {
@@ -191,7 +210,10 @@ public class MetroControllersLeft {
             }
 
             if ((!(resultString.equals("")) && (!nameAleadyExists))) {
-                Station station = new Station(resultString);
+                Station station = new Station(resultString, false);
+                station.add();
+                App.app.getTransactions().pushUndo(new AddObjectT(station));
+                data.setSelectedStation(station);
             } else {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Name already exists");
@@ -203,15 +225,32 @@ public class MetroControllersLeft {
 
     public void handleSetStationColor(Color c) {
         Station station = App.app.getDataComponent().getSelectedStation();
-        if (station != null && !station.getName().equals("")) {
-            station.changeColor(c);
+        if (station != null && !station.isEndOfLine()) {
+            if (!station.getColor().equals(c)) {
+                System.out.println(station.getColor().toString());
+                App.app.getTransactions().pushUndo(new EditStation(station));
+                System.out.println(c.toString());
+                station.changeColor(c);
+            }
         }
     }
 
-    public void handleStationRadiusSlider(double d) {
-        try {
-            App.app.getDataComponent().getSelectedStation().getCircle().setRadius(d);
-        } catch (NullPointerException ex) {
+    public void handleStationRadiusSlider(MouseState state, double r) {
+
+        if (!(App.app.getDataComponent().getSelectedStation() == null)) {
+            Station station = App.app.getDataComponent().getSelectedStation();
+            switch (state) {
+                case PRESSED:
+                    App.app.getTransactions().pushUndo(new EditStation(station));
+                    break;
+                case RELEASED:
+                    EditStation transaction = (EditStation) App.app.getTransactions().peekUndo();
+                    if (transaction.getRadius() == r) {
+                        App.app.getTransactions().popUndoWithouAction();
+                    }
+                    break;
+            }
+            station.getCircle().setRadius(r);
         }
     }
 
@@ -220,12 +259,17 @@ public class MetroControllersLeft {
         // check if there are no stations at all
         if (station != null) {
             try {
-
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete this statin?", ButtonType.YES, ButtonType.CANCEL);
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete this station?", ButtonType.YES, ButtonType.CANCEL);
                 alert.showAndWait();
-
                 if (alert.getResult() == ButtonType.YES) {
-                    station.deleteStation();
+                    App.app.getTransactions().pushUndo(new RemoveStationT(station));
+                    station.remove();
+                    if (App.app.getDataComponent().getMetroStations().size() > 0) {
+                        App.app.getDataComponent().setSelectedStation(
+                                App.app.getDataComponent().getMetroStations().get(0));
+                    } else {
+                        App.app.getDataComponent().setSelectedStation(null);
+                    }
                 }
             } catch (NullPointerException ex) {
             }
@@ -265,32 +309,26 @@ public class MetroControllersLeft {
     }
 
     public void handleMoveLabelButton() {
-
+        // change was here
         try {
-            Object a = App.app.getDataComponent().getLastSelectedElement();
-            if (a instanceof Station) {
-                Station station = (Station) a;
-                station.changeLabelPosition();
-            }
+            Station a = App.app.getDataComponent().getSelectedStation();
+            Station station = (Station) a;
+            App.app.getTransactions().pushUndo(new EditStation(station));
+            station.changeLabelPosition();
         } catch (NullPointerException ex) {
         }
     }
 
     public void handleRotateLabelButton() {
-
-        try {
-            Object a = App.app.getDataComponent().getLastSelectedElement();
-            if (a instanceof Station) {
-                Station station = (Station) a;
-
-                if (station.getLabelRotation() == 0) {
-                    station.setLabelRotation(1);
-                } else {
-                    station.setLabelRotation(0);
-                }
-            }
-        } catch (NullPointerException ex) {
+//        try {
+        Object a = App.app.getDataComponent().getLastSelectedElement();
+        if (a instanceof Station) {
+            Station station = (Station) a;
+            App.app.getTransactions().pushUndo(new EditStation(station));
+            station.switchRotation();
         }
+//        } catch (NullPointerException ex) {
+//        }
     }
 
     public void handleFindRouteButton() {
@@ -299,21 +337,21 @@ public class MetroControllersLeft {
                     .getFromComboBox().getSelectionModel().getSelectedItem();
             Station to = (Station) App.app.getWorkspace().getLeftPanel()
                     .getToComboBox().getSelectionModel().getSelectedItem();
-
         } catch (NullPointerException npe) {
         }
-
     }
 
     public void handleAddImageButton() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose image");
-
         try {
             File file = fileChooser.showOpenDialog(App.app.getStage());
             String filePath = file.toString();
-            if (filePath.endsWith(".jpeg") || filePath.endsWith(".jpg") || filePath.endsWith(".png") || filePath.endsWith(".gif")) {
+
+            if (filePath.endsWith(".jpeg") || filePath.endsWith(".jpg")
+                    || filePath.endsWith(".png") || filePath.endsWith(".gif")) {
                 DraggableImage image = new DraggableImage(file);
+                App.app.getTransactions().pushUndo(new AddObjectT(image));
                 App.app.getDataComponent().setLastSelectedElement(image);
             }
         } catch (NullPointerException ex) {
@@ -330,8 +368,10 @@ public class MetroControllersLeft {
 
         // discard null string and cancel or close button
         if (result.isPresent() && !(result.get().equals(""))) {
-            DraggableText text = new DraggableText(result.get());
+            Text text = new Text(result.get());
+            App.app.getTransactions().pushUndo(new AddObjectT(text));
             App.app.getDataComponent().setLastSelectedElement(text);
+
         }
     }
 
@@ -344,13 +384,18 @@ public class MetroControllersLeft {
             String filePath = file.toString();
             if (filePath.endsWith(".jpeg") || filePath.endsWith(".jpg") || filePath.endsWith(".png") || filePath.endsWith(".gif")) {
                 Background background = new Background(file);
+                App.app.getTransactions().pushUndo(new AddObjectT(background));
             }
         } catch (NullPointerException ex) {
         }
     }
 
     public void handleSetBackgroundColorButton(Color color) {
-        App.app.getWorkspace().getCanvasComponent().setCanvasColor(color);
+        Color backgroundColor = App.app.getWorkspace().getCanvasComponent().getCanvasColor();
+        if (!(color.equals(backgroundColor))) {
+            App.app.getTransactions().pushUndo(new BackgroundColor());
+            App.app.getWorkspace().getCanvasComponent().setCanvasColor(color);
+        }
     }
 
     public void handleFontColorButton(Color c) {
@@ -362,29 +407,27 @@ public class MetroControllersLeft {
                 App.app.getTransactions().pushUndo(new ChangeFont(station.getLabel()));
                 station.changeFontColor(c);
             }
-        } else if (App.app.getDataComponent().getLastSelectedElement() instanceof DraggableText) {
-            DraggableText text = (DraggableText) o;
+        } else if (App.app.getDataComponent().getLastSelectedElement() instanceof Text) {
+            Text text = (Text) o;
             if (!((Color) text.getLabel().getTextFill()).equals(c)) {
-                App.app.getTransactions().pushUndo(new ChangeFont(((DraggableText) o).getLabel()));
-                ((DraggableText) o).changeFontColor(c);
+                App.app.getTransactions().pushUndo(new ChangeFont(((Text) o).getLabel()));
+                ((Text) o).changeFontColor(c);
             }
         }
     }
 
     public void handleRemoveElementButton() {
-        Object lastSelected = App.app.getDataComponent().getLastSelectedElement();
-
+        Addable lastSelected = (Addable) App.app.getDataComponent().getLastSelectedElement();
         try {
-            if (lastSelected instanceof DraggableText) {
-                ((DraggableText) lastSelected).remove();
-            } else if (lastSelected instanceof DraggableImage) {
-                ((DraggableImage) lastSelected).deleteImage();
-            } else if (lastSelected instanceof Background) {
-                ((Background) lastSelected).deleteBackground();
+            // stations and lines have their own remove buttons
+            if (lastSelected instanceof Text
+                    || lastSelected instanceof DraggableImage
+                    || lastSelected instanceof Background) {
+                lastSelected.remove();
+                App.app.getTransactions().pushUndo(new RemoveObjectT(lastSelected));
             }
         } catch (NullPointerException ex) {
         }
-
     }
 
     public void handleFontFamilyComboBox(String family) {
@@ -430,7 +473,6 @@ public class MetroControllersLeft {
             App.app.getTransactions().pushUndo(new ChangeFont(fontNode.getLabel()));
             fontNode.changeFontBold();
         }
-
     }
 
     public void handleShowGridToggleButton() {
@@ -438,29 +480,30 @@ public class MetroControllersLeft {
     }
 
     public void handleZoomInButton() {
-
-        Pane canvas = App.app.getWorkspace().getCanvasComponent().getCanvas();
-        canvas.setScaleX(canvas.getScaleX() * 1.1);
-        canvas.setScaleY(canvas.getScaleY() * 1.1);
+        App.app.getWorkspace().getCanvasComponent().zoomOut();
     }
 
     public void handleZoomOutButton() {
+//        App.app.getWorkspace().getCanvasComponent().zoomOut();
+          App.app.getDataComponent().getSelectedLine().circulate();
 
-        Pane canvas = App.app.getWorkspace().getCanvasComponent().getCanvas();
-        canvas.setScaleX(canvas.getScaleX() / 1.1);
-        canvas.setScaleY(canvas.getScaleY() / 1.1);
     }
 
     public void handleEnlargeMapButton() {
-        Pane canvas = App.app.getWorkspace().getCanvasComponent().getCanvas();
-        canvas.setPrefSize(canvas.getWidth() * 1.1, canvas.getHeight() * 1.1);
-
+        if (!App.app.getWorkspace().getCanvasComponent().enlargeMap()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Reached maximum size");
+            alert.setHeaderText("Reached maximum size");
+            alert.showAndWait();
+        }
     }
 
     public void handleReduceMapButton() {
-        Pane canvas = App.app.getWorkspace().getCanvasComponent().getCanvas();
-        if (canvas.getWidth() >= 200 && canvas.getHeight() >= 200) {
-            canvas.setPrefSize(canvas.getWidth() / 1.1, canvas.getHeight() / 1.1);
+        if (!App.app.getWorkspace().getCanvasComponent().reduceMap()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Reached minimum size");
+            alert.setHeaderText("Reached minimum size");
+            alert.showAndWait();
         }
     }
 

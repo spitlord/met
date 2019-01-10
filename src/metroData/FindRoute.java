@@ -6,7 +6,7 @@
 package metroData;
 
 import java.util.ArrayList;
-import metroDraggableObjects.Station;
+import canvasObjects.Station;
 
 /**
  *
@@ -15,8 +15,6 @@ import metroDraggableObjects.Station;
 public class FindRoute {
     
     ArrayList<Node> queue;
-    
-    
     
     public void shortestPath(Station from, Station to) {
         ArrayList<Node> stack = new ArrayList();

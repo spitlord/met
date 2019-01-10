@@ -13,16 +13,12 @@ import javafx.stage.StageStyle;
 import javax.json.JsonObject;
 import metroData.MetroData;
 import metroFiles.MetroFiles;
-import metroWorkspace.MetroWorkspace;
-import metroWorkspace.WelcomeDialog;
+import workspace.Workspace;
+import workspace.WelcomeDialog;
 import transactions.TransactionStack;
 
 
 
-/**
- *
- * @author XDXD
- */
 public class App extends Application {
 
     /**
@@ -35,7 +31,7 @@ public class App extends Application {
     private Stage stage;
     private Scene scene;
     private JsonObject propertiesObject;           // contains the properties and strings
-    private MetroWorkspace workspace;              // the gui and method of communication between components
+    private Workspace workspace;              // the gui and method of communication between components
     private MetroFiles fileComponent;   
     private MetroData dataComponent;  
     private TransactionStack transactions;
@@ -60,17 +56,13 @@ public class App extends Application {
         
         fileComponent = new MetroFiles();
         dataComponent = new MetroData();
-        workspace = new MetroWorkspace();
-        
+        workspace = new Workspace();
         transactions = new TransactionStack();
         
         // show the stage after it has been set up
         primaryStage.setTitle(propertiesObject.getString("appTitle"));
         primaryStage.setScene(scene);
-        primaryStage.initStyle(StageStyle.UNIFIED);
-        
-        
-            
+        primaryStage.initStyle(StageStyle.UNIFIED);      
 
         stage = primaryStage;
         WelcomeDialog.show();
@@ -80,7 +72,7 @@ public class App extends Application {
     
     
     
-    public static void main(String[] args) {
+    private static void main(String[] args) {
         launch(args);
     }
     
@@ -105,7 +97,7 @@ public class App extends Application {
         return propertiesObject;
     }
     
-     public MetroWorkspace getWorkspace() {
+     public Workspace getWorkspace() {
         return workspace;
     }
    
