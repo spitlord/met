@@ -99,7 +99,6 @@ public class InsertStation {
         if (cubic != 0) {
             Cubic equation = new Cubic();
             equation.solve(cubic, quadratic, linear, constant);
-            equation.toString();
             if (equation.nRoots == 1) {
                 roots = new double[]{equation.x1};
             } else {

@@ -35,6 +35,7 @@ import java.io.IOException;
 public class MetroFiles {
 
     public MetroFiles() {
+        
     }
 
     public void proposeNewFile() {
@@ -141,7 +142,8 @@ public class MetroFiles {
                 y = connectionsJson.getJsonObject(j).getJsonNumber("curveY").doubleValue();
                 connections.get(j).getControl().setCenterY(y);
                 connections.get(j).getControl().setCenterX(x);
-            }
+            } 
+            
         }
     }
 
@@ -213,7 +215,6 @@ public class MetroFiles {
                 jsonFile.getJsonNumber("layoutX").doubleValue());
         App.app.getWorkspace().getCanvasComponent().getCanvas().setLayoutY(
                 jsonFile.getJsonNumber("layoutY").doubleValue());
-
     }
 
     private JsonObjectBuilder saveStation(Station s) {
@@ -346,8 +347,9 @@ public class MetroFiles {
         }
     }
 
-    public void saveFile() throws FileNotFoundException {
-
+    public void saveFile(String path) throws FileNotFoundException {
+        
+        
         MetroData data = App.app.getDataComponent();
 
         JsonObjectBuilder file = Json.createObjectBuilder();
@@ -369,19 +371,15 @@ public class MetroFiles {
         file.add("layoutX", App.app.getWorkspace().getCanvasComponent().getCanvas().getLayoutX());
         file.add("layoutY", App.app.getWorkspace().getCanvasComponent().getCanvas().getLayoutY());
 
-        String name = App.app.getDataComponent().getCurrentFile().getName();
+//        String name = App.app.getDataComponent().getCurrentFile().getName();
 
-        File currentFile = App.app.getDataComponent().getCurrentFile();
+        File currentFile = new File(path);//App.app.getDataComponent().getCurrentFile();
 
         FileOutputStream os = new FileOutputStream(currentFile);
 
         try (JsonWriter jsonWriter = Json.createWriter(os)) {
             jsonWriter.writeObject(file.build());
         }
-
-    }
-
-    public void saveFileAs() {
 
     }
 

@@ -67,9 +67,10 @@ public class DraggableImage implements Movable, Addable {
         App.app.getWorkspace().getCanvasComponent().getCanvas().getChildren().add(imageView);
         App.app.getDataComponent().getImages().add(this);
     }
-    public void remove() {
+    public boolean remove() {
         App.app.getWorkspace().getCanvasComponent().getCanvas().getChildren().remove(imageView);
         App.app.getDataComponent().getImages().remove(this);
+        return true;
     }
 
     public Image getImage() {

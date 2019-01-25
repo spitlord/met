@@ -121,7 +121,7 @@ public final class Station implements ChangableFont, ChangableColor, Movable, Ad
     
     
     @Override
-    public void remove() {
+    public boolean remove() {
         if (!endOfLine) {
             MetroData data = App.app.getDataComponent();
             
@@ -135,6 +135,7 @@ public final class Station implements ChangableFont, ChangableColor, Movable, Ad
            App.app.getWorkspace().getCanvasComponent().getCanvas().getChildren().remove(circle);
            App.app.getWorkspace().getCanvasComponent().getCanvas().getChildren().remove(label);
         }
+        return true;
     }
     
     public Circle getCircle() {
@@ -179,6 +180,15 @@ public final class Station implements ChangableFont, ChangableColor, Movable, Ad
         }
     }
     
+    public boolean isRemovable() {
+        boolean removable;
+        for (int i = 0; i < lines.size(); i++) {
+            MetroLine line = lines.get(i);
+            if (line.isCircular() && line.getStations().size() <= 4)
+                return false;
+        }
+        return true;
+    }
 
     public void changeLabelPosition() {
         labelPosition++;
@@ -359,6 +369,10 @@ public final class Station implements ChangableFont, ChangableColor, Movable, Ad
     }
 
   
+    @Override
+    public String toString() {
+        return name;
+    }
     
     
     

@@ -52,6 +52,7 @@ public class LeftPanel {
    Button addStationsToLineButton;
    Button removeStationsFromLineButton;
    Button listAllStationsButton;
+   Button circulateButton;
    
    // 3row implicit
    Slider lineThicknessSlider;
@@ -172,10 +173,7 @@ public class LeftPanel {
         };
         lineComboBox.setButtonCell((ListCell)cellFactory.call(null));
         lineComboBox.setCellFactory(cellFactory);
-        
- 
-        
-        //
+
 
         lineColorPicker = new ColorPicker();
         lineColorPicker.setValue(Color.BLACK);
@@ -195,13 +193,16 @@ public class LeftPanel {
         editLineButton = new Button();
         addStationsToLineButton = new Button();
         removeStationsFromLineButton = new Button();
-        listAllStationsButton = new Button();         
+        listAllStationsButton = new Button();    
+        circulateButton = new Button();
         initButton(addLineButton, metroLinesToolbarB, "addLineIcon", "addLineTooltip");  
         initButton(removeLineButton, metroLinesToolbarB, "removeLineIcon", "removeLineTooltip");  
         initButton(editLineButton, metroLinesToolbarB, "editLineIcon", "editLineTooltip");
         initButton(addStationsToLineButton, metroLinesToolbarB, "addStationsToLineIcon", "addStationsToLineTooltip");
         initButton(removeStationsFromLineButton, metroLinesToolbarB, "removeStationsFromLineIcon", "removeStationsFromLineTooltip");
-        initButton(listAllStationsButton, metroLinesToolbarB, "listAllStationsIcon", "listAllStationsTooltip");  
+        initButton(listAllStationsButton, metroLinesToolbarB, "listAllStationsIcon", "listAllStationsTooltip");
+        initButton(circulateButton, metroLinesToolbarB, "circulateButtonIcon", "circulateButtonTooltip");  
+
         
         // row three
         lineThicknessSlider = new Slider();
@@ -606,6 +607,9 @@ public class LeftPanel {
         addStationsToLineButton.setOnMouseClicked(e -> {controllers.handleAddStationsToLineButton();});
         removeStationsFromLineButton.setOnMouseClicked(e -> {controllers.handleRemoveStationsFromLineButton();});
         listAllStationsButton.setOnMouseClicked(e -> {controllers.handleListAllStationsButton();});
+        circulateButton.setOnMouseClicked(e -> {
+            controllers.handleCirculateButton();
+        });
         lineComboBox.setOnAction(e -> {
             try {
             controllers.handleLineComboBox((MetroLine)lineComboBox.getValue());

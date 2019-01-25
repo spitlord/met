@@ -3,10 +3,10 @@ package transactions;
 import canvasObjects.MetroLine;
 
 
-public class CirculateT implements Transaction {
+public class DecirculateT implements Transaction {
     MetroLine line;
 
-    public CirculateT(MetroLine line) {
+    public DecirculateT(MetroLine line) {
         this.line = line;
     }
     
@@ -14,13 +14,12 @@ public class CirculateT implements Transaction {
 
     @Override
     public void undo() {
-        line.decirculate();
-        
+        line.circulate();
     }
 
     @Override
     public void redo() {
-        line.circulate();
+        line.decirculate();
     }
     
 

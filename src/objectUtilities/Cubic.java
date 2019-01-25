@@ -166,14 +166,4 @@ public class Cubic
             double tmp = x1; x1 = x2; x2 = tmp;
             }
         }
-    
-    public String toString () {
-        System.out.print("NUM: " + nRoots );
-        if(nRoots == 1) {
-            System.out.println("  root: " + this.x1);
-        }
-        else System.out.println("  roots: " + this.x1 +
-                ", " + this.x2 + ", " + this.x3  );
-        return null;
-    }
 }

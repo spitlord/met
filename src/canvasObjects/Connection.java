@@ -26,10 +26,9 @@ public class Connection implements Movable {
     Station a, b;
     double distance;
     
-    Connection() {
-        
-    }
-
+    private double startX, startY;
+    
+    Connection() {}
 
     public Connection(MetroLine metroLine) {
         
@@ -44,54 +43,36 @@ public class Connection implements Movable {
         control.setStrokeWidth(3);
 
         connectionCurve.setFill(Color.TRANSPARENT);
-        connectionCurve.setStroke(Color.BLACK);
-    }
-
-    void connect(Station a, Station b) {
-        
-        // get the canvas
-        MetroCanvas metroCanvas  = App.app.getWorkspace().getCanvasComponent();
-        
         connectionCurve.setStrokeWidth(metroLine.lineThickness);
         connectionCurve.setStroke(metroLine.color);
-
-        // bind the ends of the curve to the stations
+    }
+    
+     private void bindConnection() {
         connectionCurve.startXProperty().bind(a.getCircle().centerXProperty());
         connectionCurve.startYProperty().bind(a.getCircle().centerYProperty());
         connectionCurve.endXProperty().bind(b.getCircle().centerXProperty());
         connectionCurve.endYProperty().bind(b.getCircle().centerYProperty());
-        
-        // use controll
         connectionCurve.controlXProperty().bind(control.centerXProperty());
         connectionCurve.controlYProperty().bind(control.centerYProperty());
         control.setVisible(false);
-        
         control.setCenterX((connectionCurve.getEndX() + connectionCurve.getStartX())/2);
         control.setCenterY((connectionCurve.getEndY() + connectionCurve.getStartY())/2);
-        
+    }
+    
+    private void setUpControls() {
         connectionCurve.setOnMousePressed(e -> {
                   App.app.getWorkspace().getLeftPanel().getLineColorPicker().setValue((Color)connectionCurve.getStroke());
         });
         connectionCurve.setOnMouseClicked(e -> {
             // show the control circle and select the metroLine
             if (e.getTarget() == connectionCurve) {
-                
-                // select line that connection belongs to
                 App.app.getDataComponent().setSelectedLine(metroLine);
-                
-                // show the line ends
                 metroLine.showEnds();
-                // unselect the previous control circle!
                 try {
                     App.app.getDataComponent().getSelectedConnection().getControl().setVisible(false);
                 } catch (NullPointerException ex) {}
-                
-                // make it selected
                 App.app.getDataComponent().setSelectedConnection(this);
-                
-                
             }
-            
             e.consume();
         });
         control.setOnMouseDragged(e -> {
@@ -99,51 +80,64 @@ public class Connection implements Movable {
             control.setCenterY(e.getY());
             e.consume();
         });
-     control.setOnMousePressed(e -> {
-              App.app.getTransactions().pushUndo(new MoveElement(this));    
+        control.setOnMousePressed(e -> {
+            startX = control.getCenterX();
+            startY = control.getCenterY();
+            App.app.getTransactions().pushUndo(new MoveElement(this));
+
         });
         control.setOnMouseDragged(e -> {
-        control.setCenterX(e.getX()+2);
-        control.setCenterY(e.getY()+2);
+            control.setCenterX(e.getX()+2);
+            control.setCenterY(e.getY()+2);
         e.consume();
         });
         
        control.setOnMouseReleased(e -> {
-              Transaction temp = App.app.getTransactions().peekUndo();
-              if (temp instanceof MoveElement) {
-                  if (
-                      ((MoveElement) temp).getMovable() == this &&
-                      ((MoveElement) temp).getX() == control.getCenterX() &&
-                      ((MoveElement) temp).getY() == control.getCenterY()) {
-                      App.app.getTransactions().popUndoWithouAction();
-                  }
-              }
-        });
-  
-        metroCanvas.getCanvas().getChildren().addAll(connectionCurve, control);
-       
-        // put behind the circle not to obstract the dragging
-        connectionCurve.toBack();
-        
-        // !!!! THERE WAS NULL POINTER EX
-            a.getNeighbors().add(b);
-            b.getNeighbors().add(a);
+           if  (startX == control.getCenterX() || startY == control.getCenterY()) 
+               App.app.getTransactions().popUndoWithouAction();
+       });
+    }
+
+    void connect(Station a, Station b) {
+        this.a = a; 
+        this.b = b;
+        a.getNeighbors().add(b);
+        b.getNeighbors().add(a); 
+        bindConnection();
+        setUpControls();
     }
     
     
     public void disconnect () {
-        // get the canvas
-        MetroCanvas metroCanvas  = App.app.getWorkspace().getCanvasComponent();
+        metroLine.getConnections().remove(this);
         
-        // remove from the root
+        MetroCanvas metroCanvas  = App.app.getWorkspace().getCanvasComponent();
         metroCanvas.getCanvas().getChildren().remove(connectionCurve);
         metroCanvas.getCanvas().getChildren().remove(control);
         
-        // why the fuck?
-      try {
         a.getNeighbors().remove(b);
         b.getNeighbors().remove(a);
-      } catch (NullPointerException ex) {}
+    }
+    
+    private void center() {
+        double centerX = (a.getCircle().getCenterX()
+                + b.getCircle().getCenterX()) / 2.0;
+        double centerY = (a.getCircle().getCenterY()
+                + b.getCircle().getCenterY()) / 2.0;
+        control.setCenterX(centerX);
+        control.setCenterY(centerY);
+    }
+    
+    
+    public void add() {
+        add(metroLine.getConnections().size());
+    }
+    
+    public void add(int index) {
+        metroLine.getConnections().add(index, this);
+        MetroCanvas metroCanvas = App.app.getWorkspace().getCanvasComponent();
+        metroCanvas.getCanvas().getChildren().addAll(connectionCurve, control);
+        connectionCurve.toBack();
     }
 
     public Circle getControl() {
@@ -169,19 +163,6 @@ public class Connection implements Movable {
         control.setVisible(true);
     }
     
-    public double approximateLength() {
-        double ax = a.getCircle().getCenterX();
-        double ay = a.getCircle().getCenterY();
-        
-        double bx = b.getCircle().getCenterX();
-        double by = b.getCircle().getCenterY();
-        
-        double cx = control.getCenterX();
-        double cy = control.getCenterY();
-        return 0;
-    }
-    
-    
     @Override
     public void setX(double x) {
         control.setCenterX(x);
@@ -206,12 +187,10 @@ public class Connection implements Movable {
         return this;
     }
     
+    @Override
+    public String toString() {
+        return a.getName() + ", " + b.getName();
+    }
     
 
-   
-    
-   
-    
-    
-    
 }

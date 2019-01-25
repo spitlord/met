@@ -74,9 +74,10 @@ public final class Text implements ChangableFont, Movable, Addable {
     }
     
     @Override
-    public void remove() {
+    public boolean remove() {
          App.app.getDataComponent().getText().remove(this);
          App.app.getWorkspace().getCanvasComponent().getCanvas().getChildren().remove(label);
+         return true;
     }
     
     

@@ -55,11 +55,11 @@ public class Background implements Addable {
         
     }
     
-    
     @Override
-    public void remove() {
+    public boolean remove() {
         App.app.getWorkspace().getCanvasComponent().getCanvas().getChildren().remove(imageView);
         App.app.getDataComponent().getImages().remove(this);
+        return true;
     }
 
     public Image getImage() {

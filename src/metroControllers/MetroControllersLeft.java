@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package metroControllers;
 
 import canvasObjects.Addable;
@@ -34,9 +29,12 @@ import transactions.AddStationToLineT;
 import workspace.MouseState;
 import transactions.BackgroundColor;
 import transactions.ChangeFont;
+import transactions.CirculateT;
+import transactions.DecirculateT;
 import transactions.EditLine;
 import transactions.EditStation;
 import transactions.RemoveObjectT;
+import transactions.RemoveStationFromLineCircularT;
 import transactions.RemoveStationFromLineT;
 import transactions.RemoveStationT;
 
@@ -58,7 +56,7 @@ public class MetroControllersLeft {
         // discard null string and cancel or close button
         if (result.isPresent() && !(result.get().equals(""))) {
             MetroLine newLine = new MetroLine(result.get());
-//            newLine.add();
+            App.app.getDataComponent().setSelectedLine(newLine);
             App.app.getTransactions().pushUndo(new AddObjectT(newLine));
         }
     }
@@ -139,8 +137,18 @@ public class MetroControllersLeft {
         try {
             Station station = App.app.getDataComponent().getSelectedStation();
             MetroLine line = App.app.getDataComponent().getSelectedLine();
+            if (line.isCircular()) {
+                if (line.getStations().size() > 4) {
+                    App.app.getTransactions().pushUndo(
+                        new RemoveStationFromLineCircularT(line, station));
+                }
+            }
+            else {
+                 App.app.getTransactions().pushUndo(
+                    new RemoveStationFromLineT(line, station));
+            }
             line.removeStationFromLine(station);
-            App.app.getTransactions().pushUndo(new RemoveStationFromLineT(line, station));
+            
         } catch (NullPointerException ex) {
         }
     }
@@ -256,19 +264,23 @@ public class MetroControllersLeft {
 
     public void handleRemoveStationButton() {
         Station station = App.app.getDataComponent().getSelectedStation();
-        // check if there are no stations at all
-        if (station != null) {
+        if (station != null && !station.isEndOfLine()) {
             try {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete this station?", ButtonType.YES, ButtonType.CANCEL);
                 alert.showAndWait();
                 if (alert.getResult() == ButtonType.YES) {
-                    App.app.getTransactions().pushUndo(new RemoveStationT(station));
-                    station.remove();
-                    if (App.app.getDataComponent().getMetroStations().size() > 0) {
-                        App.app.getDataComponent().setSelectedStation(
-                                App.app.getDataComponent().getMetroStations().get(0));
-                    } else {
-                        App.app.getDataComponent().setSelectedStation(null);
+                    if (station.isRemovable()) {
+                        App.app.getTransactions().pushUndo(new RemoveStationT(station));
+                        station.remove();
+                        if (App.app.getDataComponent().getMetroStations().size() > 0) {
+                            App.app.getDataComponent().setSelectedStation(
+                                    App.app.getDataComponent().getMetroStations().get(0));
+                        } else {
+                            App.app.getDataComponent().setSelectedStation(null);
+                        }
+                    }
+                    else {
+                        System.out.println("MESSAGE");
                     }
                 }
             } catch (NullPointerException ex) {
@@ -359,7 +371,7 @@ public class MetroControllersLeft {
     }
 
     public void handleAddTextButton() {
-
+        
         TextInputDialog a = new TextInputDialog();
         a.setTitle("Add text");
         a.setHeaderText("Enter the text: ");
@@ -378,7 +390,6 @@ public class MetroControllersLeft {
     public void handleSetImageBackgroundButton() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose image");
-
         try {
             File file = fileChooser.showOpenDialog(App.app.getStage());
             String filePath = file.toString();
@@ -440,9 +451,9 @@ public class MetroControllersLeft {
                 fontNode.changeFontFamily(family);
             }
         }
-
     }
 
+    
     public void handleFontSizeComboBox(String sizeString) {
         Object lastSelected = App.app.getDataComponent().getLastSelectedElement();
         int size = Integer.valueOf(sizeString);
@@ -480,14 +491,29 @@ public class MetroControllersLeft {
     }
 
     public void handleZoomInButton() {
-        App.app.getWorkspace().getCanvasComponent().zoomOut();
+        App.app.getWorkspace().getCanvasComponent().zoomIn();
+          
+
     }
 
     public void handleZoomOutButton() {
-//        App.app.getWorkspace().getCanvasComponent().zoomOut();
-          App.app.getDataComponent().getSelectedLine().circulate();
-
+        App.app.getWorkspace().getCanvasComponent().zoomOut();
     }
+    
+    public void handleCirculateButton() {
+        MetroLine line = App.app.getDataComponent().getSelectedLine();
+        if (line.isCircular())  {
+            App.app.getTransactions().pushUndo(new DecirculateT(line));
+            line.decirculate();
+        }
+        else {
+            App.app.getTransactions().pushUndo(new CirculateT(line));
+            line.circulate();
+        }
+
+    
+    }
+    
 
     public void handleEnlargeMapButton() {
         if (!App.app.getWorkspace().getCanvasComponent().enlargeMap()) {

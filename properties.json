@@ -13,6 +13,7 @@
   "redoButtonIcon": "src/images/Redo.png",
   "aboutButtonIcon": "src/images/About.png",
   "exportButtonIcon": "src/images/Export.png",
+  "circulateButtonIcon": "src/images/Circulate.png",
  
   "newButtonTooltip": "New File",
   "loadButtonTooltip": "Load File",
@@ -22,6 +23,8 @@
     "undoButtonTooltip": "Undo",
     "redoButtonTooltip": "Redo",
     "aboutButtonTooltip": "About",
+    "newButtonTooltip": "New File",
+    "circulateButtonTooltip": "Linear/Circular",
     
     "addLineIcon": "src/images/AddLine.png",
     "removeLineIcon": "src/images/RemoveLine.png",

@@ -14,29 +14,23 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javax.imageio.ImageIO;
 import metroApp.App;
 
-/**
- *
- * @author XDXD
- */
+
+
 public class MetroControllersTop {
     
+    String currentFile;
     
     public MetroControllersTop() {
     }
     
     
    
-    public void handleNewButton() {
-        
-        // propose to save the current one (if there is)
-        // before making a new one
-        
-        if (App.app.getDataComponent().getCurrentFile() != null) {
+    public void handleNewButton() {        
+        if (currentFile != null) {
             
             Alert alert = new Alert(AlertType.NONE, "Save current file?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
             alert.showAndWait();
@@ -45,12 +39,11 @@ public class MetroControllersTop {
             if (alert.getResult() == ButtonType.YES) {
                 
                 try {
-                    App.app.getFileComponent().saveFile();
-                } catch (Exception ex) {
-                    System.out.println("suka");
-                }
+                    App.app.getFileComponent().saveFile(currentFile);
+                } catch (FileNotFoundException ex) {}
             }
             if (alert.getResult() == ButtonType.CANCEL) return;
+            currentFile = null;
         }
         
             try {
@@ -61,30 +54,41 @@ public class MetroControllersTop {
     
     
     public void handleLoadButton() {
-        
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose file");
         File file = fileChooser.showOpenDialog(App.app.getStage());
         try {
-            App.app.getFileComponent().loadFile(file);
+            if (file != null) {
+                App.app.getFileComponent().loadFile(file);
+                currentFile = file.getAbsolutePath();
+            }
         } catch (FileNotFoundException x){}
     }
     
     
-    
-    
     public void handleSaveButton() {
-        try {
-            App.app.getFileComponent().saveFile();
-        } catch (FileNotFoundException ex) {
-           // Logger.getLogger(MetroControllersTop.class.getName()).log(Level.SEVERE, null, ex);
+        if (currentFile != null) {
+            try {
+                App.app.getFileComponent().saveFile(currentFile);
+            } catch (FileNotFoundException ex) {
+            }
         }
+        else handleSaveAsButton();
         
     }
+    
     public void handleSaveAsButton() {
-        DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setTitle("JavaFX Projects");
-        File selectedDirectory = chooser.showDialog(App.app.getStage());
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save Image");
+            File file = fileChooser.showSaveDialog(App.app.getStage());
+        try {
+            if (file != null) {
+                currentFile = file.getAbsolutePath();
+                App.app.getFileComponent().saveFile(currentFile);
+            }
+        } catch (FileNotFoundException ex) {
+        }
+        
         
     }
     
@@ -113,15 +117,13 @@ public class MetroControllersTop {
     }
     
     
-    
     public void handleExitButton() {
         Alert alert = new Alert(AlertType.NONE, "Save current file?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
         alert.showAndWait();
         
-        
         if (alert.getResult() == ButtonType.YES) {
             try {
-                App.app.getFileComponent().saveFile();
+                App.app.getFileComponent().saveFile("");
             } catch (FileNotFoundException ex) {
             }
             
@@ -137,8 +139,6 @@ public class MetroControllersTop {
     
     
     void proposeNewFile() {
-        // propose to create a new file
-
         TextInputDialog a = new TextInputDialog();
         a.setTitle("New file name");
         a.setHeaderText("Enter the name:");
@@ -160,7 +160,7 @@ public class MetroControllersTop {
                     badName.setTitle("File with such name exists");
                     badName.showAndWait();
                 }
-            } catch (Exception ex) {
+            } catch (IOException ex) {
 
             }
             a.close();
@@ -170,24 +170,17 @@ public class MetroControllersTop {
     }
 
     public void handleExportButton() {
-        
-        App.app.getFileComponent().export();
-        
-        
-        
+        App.app.getFileComponent().export(); 
     }
     
     public void snapshot() {
         
         Pane pane = App.app.getWorkspace().getCanvasComponent().getCanvas();
-        boolean gridVisible = App.app.getWorkspace().getCanvasComponent().getGrid().isVisible();
         App.app.getWorkspace().getCanvasComponent().getGrid().setVisible(false);
         
         WritableImage image = pane.snapshot(new SnapshotParameters(), null);
-
-  
-    
-    File file = App.app.getDataComponent().getCurrentFile();
+        
+        File file = App.app.getDataComponent().getCurrentFile();
             new File("src/exp/" + file.getName() + ".png");
 
     try {

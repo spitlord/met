@@ -13,6 +13,6 @@ public interface Addable<E> {
     
     
     public void add();
-    public void remove();
+    public boolean remove();
     
 }
